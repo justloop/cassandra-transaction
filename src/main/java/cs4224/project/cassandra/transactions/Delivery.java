@@ -1,7 +1,18 @@
 package cs4224.project.cassandra.transactions;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
+
 public class Delivery {
 
+	private Cluster cluster;
+	private Session session;
+	
+	public Delivery(){
+		cluster = Cluster.builder().addContactPoint("localhost").build();
+		session = cluster.connect("d8");
+	}
+	
 	public boolean Deliver(int w_id, int carrier_id){
 		//for DISTRICT NO 1 to 10
 		/*
