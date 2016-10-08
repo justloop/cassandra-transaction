@@ -19,21 +19,28 @@ public class Warehouse {
 		this.session = session;
 	}
 
-	public void Insert() {
-		ResultSet results;
-		// Insert one record into the users table
-		PreparedStatement statement = session.prepare(
-				"INSERT INTO users" + "(lastname, age, city, email, firstname)" + "VALUES (?,?,?,?,?);");
-		BoundStatement boundStatement = new BoundStatement(statement);
-		session.execute(boundStatement.bind("Jones", 35, "Austin", "bob@example.com", "Bob"));
-		// Use select to get the user we just entered
-		Statement select = QueryBuilder.select().all().from("mydata", "users").where(eq("lastname", "Jones"));
-		results = session.execute(select);
-		for (Row row : results) {
-			System.out.format("%s %d \n", row.getString("firstname"), row.getInt("age"));
-		}
+	public void Insert(int w_id, double w_ytd) {
+		
+		session.execute(String.format("INSERT INTO warehouse (w_id, w_ytd) VALUES (%d, %f);", w_id, w_ytd));
 	}
 
+	public void Update(int w_id, double w_ytd){
+		session.execute(String.format("UPDATE warehouse set w_ytd = %f where w_id = %d;", w_ytd, w_id));
+	}
+	
+	public void Delete(int w_id){
+		session.execute(String.format("DELETE FROM warehouse where w_id = %d;", w_id));
+	}
+	
+	public void PrintAll(){
+		System.out.println("Printing tables...");
+		ResultSet results = session.execute("SELECT * FROM warehouse");
+		for (Row row : results) {
+			System.out.format("%d %f\n", row.getInt("w_id"), row.getDouble("w_ytd"));
+		}
+	}
+	
+	/*
 	public void Update() {
 		ResultSet results;
 		// Update the same user with a new age
@@ -56,5 +63,6 @@ public class Warehouse {
 					row.getString("email"), row.getString("firstname"));
 		}
 	}
+	*/
 
 }
