@@ -18,16 +18,25 @@ public class Order {
 	}
 
 	public void Insert() {
-		ResultSet results;
-		PreparedStatement statement = session.prepare(
-				"INSERT INTO " + tablename + "(lastname, age, city, email, firstname)" + "VALUES (?,?,?,?,?);");
-		BoundStatement boundStatement = new BoundStatement(statement);
-		session.execute(boundStatement.bind("Jones", 35, "Austin", "bob@example.com", "Bob"));
-		// Use select to get the user we just entered
-		Statement select = QueryBuilder.select().all().from("mydata", "users").where(eq("lastname", "Jones"));
-		results = session.execute(select);
-		for (Row row : results) {
-			System.out.format("%s %d \n", row.getString("firstname"), row.getInt("age"));
-		}
+
+	}
+	
+	public ResultSet SelectMin(int o_w_id, int o_d_id){
+		System.out.println("Trying to select min...");
+		String query = String.format("SELECT * FROM %s where o_w_id = %d and o_d_id = %d and o_carrier_id = -1 limit 1;", tablename, o_w_id, o_d_id);
+		System.out.println(query);
+		ResultSet results = session.execute(query);
+		return results;
+	}
+	
+	//pdate the order X by setting O CARRIER ID to CARRIER ID
+	//Update all the order-lines in X by setting OL DELIVERY D to the current date and time
+	public void UpdateCarrier(int o_w_id, int o_d_id, int o_id, int o_c_id, int carrier_id){
+		System.out.println("in UpdateCarrier..");
+		String query = String.format(
+				"UPDATE order2 set o_carrier_id = %d, ol_delivery_d = dateof(now()) where o_w_id = %d and o_d_id = %d and o_id = %d and o_c_id = %d;",
+				carrier_id, o_w_id, o_d_id, o_id, o_c_id);
+		System.out.println(query);
+		//session.execute(query);
 	}
 }

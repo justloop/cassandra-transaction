@@ -39,30 +39,4 @@ public class Warehouse {
 			System.out.format("%d %f\n", row.getInt("w_id"), row.getDouble("w_ytd"));
 		}
 	}
-	
-	/*
-	public void Update() {
-		ResultSet results;
-		// Update the same user with a new age
-		session.execute("update users set age = 36 where lastname = 'Jones'");
-		// Select and show the change
-		results = session.execute("select * from users where lastname='Jones'");
-		for (Row row : results) {
-			System.out.format("%s %d\n", row.getString("firstname"), row.getInt("age"));
-		}
-	}
-
-	public void delete() {
-		ResultSet results;
-		// Delete the user from the users table
-		session.execute("DELETE FROM users WHERE lastname = 'Jones'");
-		// Show that the user is gone
-		results = session.execute("SELECT * FROM users");
-		for (Row row : results) {
-			System.out.format("%s %d %s %s %s\n", row.getString("lastname"), row.getInt("age"), row.getString("city"),
-					row.getString("email"), row.getString("firstname"));
-		}
-	}
-	*/
-
 }
