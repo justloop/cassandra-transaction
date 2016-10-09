@@ -18,9 +18,7 @@ public class WMTester {
 		session = cluster.connect("d8");
 		
 		// Test transaction
-		OrderStatus.execute(session, 1, 1, 1);
-		
-		System.out.println(session.getLoggedKeyspace());
+		StockLevel.execute(session, 1, 1, 200, 4);
 		
 		// Clean up
 		cluster.close();

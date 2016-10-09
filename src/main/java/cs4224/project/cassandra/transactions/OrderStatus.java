@@ -18,6 +18,11 @@ public class OrderStatus {
 	
 	/**
 	 * Execute an order status transaction.
+	 * @param session
+	 * @param c_w_id
+	 * @param c_d_id
+	 * @param c_id
+	 * @return
 	 */
 	public static boolean execute(Session session, int c_w_id, int c_d_id, int c_id) {
 		String keyspace = session.getLoggedKeyspace();
