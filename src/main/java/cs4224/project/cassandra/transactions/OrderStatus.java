@@ -1,17 +1,14 @@
 package cs4224.project.cassandra.transactions;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Set;
 
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.UDTValue;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
 
 public class OrderStatus {
 	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -19,28 +16,22 @@ public class OrderStatus {
 	/**
 	 * Execute an order status transaction.
 	 * @param session
-	 * @param c_w_id
-	 * @param c_d_id
+	 * @param w_id
+	 * @param d_id
 	 * @param c_id
 	 * @return
 	 */
-	public static boolean execute(Session session, int c_w_id, int c_d_id, int c_id) {
-		String keyspace = session.getLoggedKeyspace();
-		Statement statement;
+	public static boolean execute(Session session, int w_id, int d_id, int c_id) {
+		PreparedStatement statement;
 		ResultSet results;
 		
 		// Select the required customer
-		statement = QueryBuilder.select()
-							.column("c_first").column("c_middle")
-							.column("c_last").column("c_balance")
-							.column("o_id")
-							.from(keyspace, "customer")
-							.where(eq("w_id", c_w_id))
-							.and(eq("d_id", c_d_id))
-							.and(eq("c_id", c_id))
-							;
+		statement = session.prepare(
+			"SELECT c_first, c_middle, c_last, c_balance, o_id "
+				+ "FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?"
+		);
 		
-		results = session.execute(statement);
+		results = session.execute(statement.bind(w_id, d_id, c_id));
 		Row customer = results.one();
 		if (customer == null) {
 			System.out.println("The required customer does not exsit!");
@@ -54,18 +45,13 @@ public class OrderStatus {
 		
 		// Find customer's last order
 		int o_id = customer.getInt("o_id");
-		statement = QueryBuilder.select()
-				.column("o_entry_d")
-				.column("o_carrier_id").column("ol_delivery_d")
-				.column("ols")
-				.from(keyspace, "order2")
-				.where(eq("o_w_id", c_w_id))
-				.and(eq("o_d_id", c_d_id))
-				.and(eq("o_id", o_id))
-				.limit(1)
-				;
+		statement = session.prepare(
+			"SELECT o_entry_d, o_carrier_id, ol_delivery_d, ols "
+				+ "FROM order2 WHERE o_w_id = ? AND o_d_id = ? AND o_id = ? "
+				+ "LIMIT 1"
+		);
 		
-		results = session.execute(statement);
+		results = session.execute(statement.bind(w_id, d_id, o_id));
 		Row order = results.one();
 		if (order == null) {
 			System.out.println("The customer has not place any order yet!");

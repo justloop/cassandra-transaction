@@ -18,7 +18,10 @@ public class WMTester {
 		session = cluster.connect("d8");
 		
 		// Test transaction
-		PopularItem.execute(session, 1, 1, 4);
+		int[] itemNum = {1, 2, 3};
+		int[] supplier = {1, 2, 3};
+		int[] quantity = {1, 2, 1};
+		NewOrder.execute(session, 1, 1, 1, 3, itemNum, supplier, quantity);
 		
 		// Clean up
 		cluster.close();
