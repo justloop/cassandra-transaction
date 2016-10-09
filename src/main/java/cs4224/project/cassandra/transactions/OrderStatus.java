@@ -33,6 +33,7 @@ public class OrderStatus {
 		statement = QueryBuilder.select()
 							.column("c_first").column("c_middle")
 							.column("c_last").column("c_balance")
+							.column("o_id")
 							.from(keyspace, "customer")
 							.where(eq("w_id", c_w_id))
 							.and(eq("d_id", c_d_id))
@@ -51,16 +52,16 @@ public class OrderStatus {
 		System.out.println("C_LAST: " + customer.getString("c_last"));
 		System.out.println("C_BALANCE: " + customer.getDouble("c_balance"));
 		
-		
 		// Find customer's last order
+		int o_id = customer.getInt("o_id");
 		statement = QueryBuilder.select()
-				.column("o_id").column("o_entry_id")
+				.column("o_entry_d")
 				.column("o_carrier_id").column("ol_delivery_d")
 				.column("ols")
 				.from(keyspace, "order2")
 				.where(eq("o_w_id", c_w_id))
 				.and(eq("o_d_id", c_d_id))
-				.and(eq("o_c_id", c_id))
+				.and(eq("o_id", o_id))
 				.limit(1)
 				;
 		
@@ -72,7 +73,7 @@ public class OrderStatus {
 		}
 		
 		System.out.println("O_ID: " + order.getInt("o_id"));
-		System.out.println("O_ENTRY_D: " + df.format(order.getTimestamp("o_entry_id")));
+		System.out.println("O_ENTRY_D: " + df.format(order.getTimestamp("o_entry_d")));
 		System.out.println("O_CARRIER_ID: " + order.getInt("o_carrier_id"));
 		
 		// List each item

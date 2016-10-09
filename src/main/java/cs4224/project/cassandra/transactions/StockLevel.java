@@ -13,6 +13,8 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.UDTValue;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 
+import cs4224.project.cassandra.models.wm.District;
+
 public class StockLevel {
 
 	/**
@@ -30,21 +32,11 @@ public class StockLevel {
 		ResultSet results;
 		
 		// Find next available order id
-		statement = QueryBuilder.select()
-							.column("d_next_oid")
-							.from(keyspace, "nextoid")
-							.where(eq("w_id", w_id))
-							.and(eq("d_id", d_id))
-							;
-		
-		results = session.execute(statement);
-		Row district = results.one();
-		if (district == null) {
+		long nextOid = District.getNextOid(session, w_id, d_id);
+		if (nextOid < 0) {
 			System.out.println("The required district does not exsit!");
 			return false;
 		}
-		
-		long nextOid = district.getLong("d_next_oid");
 		
 		// Find last L orders
 		statement = QueryBuilder.select()
@@ -66,7 +58,7 @@ public class StockLevel {
 			}
 		}
 		
-		// TODO CHECK STOCK LEVEL
+		// Filter by stock level
 		statement = QueryBuilder.select()
 				.column("i_id").column("s_quantity")
 				.from(keyspace, "item")

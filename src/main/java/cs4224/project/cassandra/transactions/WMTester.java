@@ -18,7 +18,7 @@ public class WMTester {
 		session = cluster.connect("d8");
 		
 		// Test transaction
-		StockLevel.execute(session, 1, 1, 200, 4);
+		PopularItem.execute(session, 1, 1, 4);
 		
 		// Clean up
 		cluster.close();
