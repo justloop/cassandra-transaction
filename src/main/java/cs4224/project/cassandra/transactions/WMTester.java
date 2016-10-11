@@ -17,11 +17,21 @@ public class WMTester {
 				.build();
 		session = cluster.connect("d8");
 		
-		// Test transaction
-		int[] itemNum = {1, 2, 3};
-		int[] supplier = {1, 2, 3};
-		int[] quantity = {1, 2, 1};
-		NewOrder.execute(session, 1, 1, 1, 3, itemNum, supplier, quantity);
+		/*
+		// Test new order
+		int[] itemNum = {1, 2};
+		int[] supplier = {1, 1};
+		int[] quantity = {1, 2};
+		NewOrder.execute(session, 1, 1, 1, 2, itemNum, supplier, quantity);
+		*/
+		
+		/*
+		// Test payment
+		Payment.execute(session, 1, 1, 1, 100);
+		*/
+		
+		// Test order status
+		OrderStatus.execute(session, 1, 1, 1);
 		
 		// Clean up
 		cluster.close();

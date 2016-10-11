@@ -30,56 +30,46 @@ public class Payment {
 		statement = session.prepare(
 			"SELECT * FROM warehouse WHERE w_id = ?"
 		);
-		
 		results = session.execute(statement.bind(w_id));
 		Row warehouse = results.one();
-		if (warehouse == null) {
-			System.out.println("The requried warehose does not exist");
-			return false;
-		}
 		
 		statement = session.prepare(
 			"UPDATE warehouse SET w_ytd = ? WHERE w_id = ?"
 		);
-		session.execute(statement.bind(warehouse.getDouble("w_ytd") + payment));
+		session.execute(statement.bind(
+			warehouse.getDouble("w_ytd") + payment, w_id
+		));
 		
 		// Update district
 		statement = session.prepare(
 			"SELECT * FROM district WHERE w_id = ? AND d_id = ?"
 		);
-			
 		results = session.execute(statement.bind(w_id, d_id));
 		Row district = results.one();
-		if (district == null) {
-			System.out.println("The requried district does not exist");
-			return false;
-		}
 		
 		statement = session.prepare(
 			"UPDATE district SET d_ytd = ? WHERE w_id = ? AND d_id = ?"
 		);
-		session.execute(statement.bind(district.getDouble("d_ytd") + payment));
+		session.execute(statement.bind(
+			district.getDouble("d_ytd") + payment, w_id, d_id
+		));
 		
 		// Update customer
 		statement = session.prepare(
 			"SELECT * FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?"
 		);
-			
-		results = session.execute(statement.bind(w_id, d_id));
+		results = session.execute(statement.bind(w_id, d_id, c_id));
 		Row customer = results.one();
-		if (customer == null) {
-			System.out.println("The requried customer does not exist");
-			return false;
-		}
 		
 		statement = session.prepare(
-			"UPDATE customer SET c_balance = ?, c_ytd_payment = ?, c_payment_cnt = ? " + 
-					"WHERE w_id = ? AND d_id = ? AND c_id = ?"
+			"UPDATE customer SET c_balance = ?, c_ytd_payment = ?, c_payment_cnt = ? "
+					+ "WHERE w_id = ? AND d_id = ? AND c_id = ?"
 		);
 		session.execute(statement.bind(
 			customer.getDouble("c_balance") - payment,
 			customer.getDouble("c_ytd_payment") + payment,
-			customer.getInt("c_payment_cnt") + 1
+			customer.getInt("c_payment_cnt") + 1,
+			w_id, d_id, c_id
 		));
 		
 		System.out.println("C_W_ID:" + w_id);
@@ -103,17 +93,17 @@ public class Payment {
 		System.out.println("C_DISCOUNT:" + customer.getDouble("c_discount"));
 		System.out.println("C_BALANCE:" + customer.getDouble("c_balance"));
 		
-		System.out.println("W_STREET_1:" + customer.getDouble("w_street_1"));
-		System.out.println("W_STREET_2:" + customer.getDouble("w_street_2"));
-		System.out.println("W_CITY:" + customer.getDouble("w_city"));
-		System.out.println("W_STATE:" + customer.getDouble("w_state"));
-		System.out.println("W_ZIP:" + customer.getDouble("w_zip"));
+		System.out.println("W_STREET_1:" + customer.getString("w_street_1"));
+		System.out.println("W_STREET_2:" + customer.getString("w_street_2"));
+		System.out.println("W_CITY:" + customer.getString("w_city"));
+		System.out.println("W_STATE:" + customer.getString("w_state"));
+		System.out.println("W_ZIP:" + customer.getString("w_zip"));
 		
-		System.out.println("D_STREET_1:" + customer.getDouble("d_street_1"));
-		System.out.println("D_STREET_2:" + customer.getDouble("d_street_2"));
-		System.out.println("D_CITY:" + customer.getDouble("d_city"));
-		System.out.println("D_STATE:" + customer.getDouble("d_state"));
-		System.out.println("D_ZIP:" + customer.getDouble("d_zip"));
+		System.out.println("D_STREET_1:" + customer.getString("d_street_1"));
+		System.out.println("D_STREET_2:" + customer.getString("d_street_2"));
+		System.out.println("D_CITY:" + customer.getString("d_city"));
+		System.out.println("D_STATE:" + customer.getString("d_state"));
+		System.out.println("D_ZIP:" + customer.getString("d_zip"));
 		
 		System.out.println("PAYMENT:" + payment);
 		

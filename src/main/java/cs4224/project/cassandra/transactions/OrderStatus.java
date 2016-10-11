@@ -2,6 +2,7 @@ package cs4224.project.cassandra.transactions;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 import com.datastax.driver.core.PreparedStatement;
@@ -30,13 +31,8 @@ public class OrderStatus {
 			"SELECT c_first, c_middle, c_last, c_balance, o_id "
 				+ "FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?"
 		);
-		
 		results = session.execute(statement.bind(w_id, d_id, c_id));
 		Row customer = results.one();
-		if (customer == null) {
-			System.out.println("The required customer does not exsit!");
-			return false;
-		}
 		
 		System.out.println("C_FIRST: " + customer.getString("c_first"));
 		System.out.println("C_MIDDLE: " + customer.getString("c_middle"));
@@ -45,31 +41,34 @@ public class OrderStatus {
 		
 		// Find customer's last order
 		int o_id = customer.getInt("o_id");
+		
 		statement = session.prepare(
 			"SELECT o_entry_d, o_carrier_id, ol_delivery_d, ols "
 				+ "FROM order2 WHERE o_w_id = ? AND o_d_id = ? AND o_id = ? "
 				+ "LIMIT 1"
 		);
-		
 		results = session.execute(statement.bind(w_id, d_id, o_id));
 		Row order = results.one();
-		if (order == null) {
-			System.out.println("The customer has not place any order yet!");
-			return false;
-		}
 		
-		System.out.println("O_ID: " + order.getInt("o_id"));
+		System.out.println("O_ID: " + o_id);
 		System.out.println("O_ENTRY_D: " + df.format(order.getTimestamp("o_entry_d")));
 		System.out.println("O_CARRIER_ID: " + order.getInt("o_carrier_id"));
+		
+		Date ol_delivery_d = order.getTimestamp("ol_delivery_d");
 		
 		// List each item
 		Set<UDTValue> orderlines = order.getSet("ols", UDTValue.class);
 		for (UDTValue item : orderlines) {
 			System.out.println("OL_I_ID: " + item.getInt("ol_i_id"));
 			System.out.println("OL_SUPPLY_W_ID: " + item.getInt("ol_supply_w_id"));
-			System.out.println("OL_QUANTITY: " + item.getDouble("ol_quantity"));
+			System.out.println("OL_QUANTITY: " + item.getInt("ol_quantity"));
 			System.out.println("OL_AMOUNT: " + item.getDouble("ol_amount"));
-			System.out.println("OL_DELIVERY_D: " + df.format(order.getTimestamp("ol_delivery_d")));
+			
+			if (ol_delivery_d != null) {
+				System.out.println("OL_DELIVERY_D: " + df.format(ol_delivery_d));
+			} else {
+				System.out.println("OL_DELIVERY_D: NA");
+			}
 		}
 		
 		return true;

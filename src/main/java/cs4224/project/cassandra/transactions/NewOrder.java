@@ -1,6 +1,5 @@
 package cs4224.project.cassandra.transactions;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,7 +44,7 @@ public class NewOrder {
 		String firstName = consumer.getString("c_first");
 		String middleName = consumer.getString("c_middle");
 		String lastName = consumer.getString("c_last");
-		String c_credit = consumer.getString("c_crdit");
+		String c_credit = consumer.getString("c_credit");
 		double c_discount = consumer.getDouble("c_discount");
 		double w_tax = consumer.getDouble("w_tax");
 		double d_tax = consumer.getDouble("d_tax");
@@ -76,12 +75,12 @@ public class NewOrder {
 				"SELECT i_name, i_price, s_quantity, s_ytd, s_order_cnt, s_remote_cnt " 
 						+ "FROM item WHERE i_w_id = ? AND i_id = ?"
 			);
-			results = session.execute(statement.bind(w_id, itemNum[i]));
+			results = session.execute(statement.bind(supplier[i], itemNum[i]));
 			Row item = results.one();
 			
 			String itemName = item.getString("i_name");
 			int s_quantity = item.getInt("s_quantity");
-			double price = item.getDouble("price");
+			double i_price = item.getDouble("i_price");
 			double s_ytd = item.getDouble("s_ytd");
 			int s_order_cnt = item.getInt("s_order_cnt");
 			int s_remote_cnt = item.getInt("s_remote_cnt");
@@ -96,14 +95,14 @@ public class NewOrder {
 					+ "WHERE i_w_id = ? AND i_id = ?"
 			);
 			session.execute(statement.bind(s_quantity, s_ytd + quantity[i], s_order_cnt + 1, 
-					s_remote_cnt + supplier[i] != w_id ? 1 : 0));
+					s_remote_cnt + supplier[i] != w_id ? 1 : 0, supplier[i], itemNum[i]));
 			
-			double itemAmount = quantity[i] * price;
+			double itemAmount = quantity[i] * i_price;
 			totalAmount += itemAmount;
 			
 			// Create Order line
 			UserType olType = session.getCluster().getMetadata().getKeyspace("d8").getUserType("orderline");
-			UDTValue ol = olType.newValue().setInt("ol_i_id", i)
+			UDTValue ol = olType.newValue().setInt("ol_i_id", itemNum[i])
 					.setString("ol_i_name", itemName)
 					.setDouble("ol_amount", itemAmount)
 					.setInt("ol_supply_w_id", supplier[i])
@@ -125,19 +124,25 @@ public class NewOrder {
 		// Create a new order
 		statement = session.prepare("INSERT INTO order2 " 
 				+ "(o_w_id, o_d_id, o_id, o_c_id, c_first, c_middle, c_last, o_carrier_id, " 
-				+ "o_ol_cn, o_all_local, o_entry_d, ols) "
+				+ "o_ol_cnt, o_all_local, o_entry_d, ols) "
 				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
 		);
 		
 		// Insert new order
-		Timestamp o_entry_d = new Timestamp(System.currentTimeMillis());
+		Date o_entry_d = new Date(System.currentTimeMillis());
 		session.execute(statement.bind(
 				w_id, d_id, o_id, c_id, firstName, middleName, lastName, -1,
 				numItems, o_all_local, o_entry_d, ols
 		));
 		
+		// Update consumer last order id
+		statement = session.prepare(
+			"UPDATE customer SET o_id = ? WHERE w_id = ? AND d_id = ? AND c_id = ?"
+		);
+		session.execute(statement.bind(o_id, w_id, d_id, c_id));
+		
 		System.out.println("O_ID: " + o_id);
-		System.out.println("O_ENTRY_D: " + df.format(new Date(o_entry_d.getTime())));
+		System.out.println("O_ENTRY_D: " + df.format(o_entry_d));
 		System.out.println("NUM_ITEMS: " + numItems);
 		System.out.println("TOTAL_AMOUNT: " + totalAmount);
 		
@@ -150,14 +155,8 @@ public class NewOrder {
 		PreparedStatement statement = session.prepare("SELECT d_next_oid FROM district WHERE w_id = ? AND d_id = ?");
 		ResultSet results = session.execute(statement.bind(w_id, d_id));
 		Row district = results.one();
-		if (district == null) {
-			System.out.println("The required district does not exsit!");
-			return -1;
-		}
 		
 		int o_id = (int) district.getInt("d_next_oid");
-		System.out.println("O_ID: " + o_id);
-		
 		// Increment
 		statement = session.prepare("UPDATE district SET d_next_oid = ? WHERE w_id = ? AND d_id = ?");
 		session.execute(statement.bind(o_id + 1, w_id, d_id));
