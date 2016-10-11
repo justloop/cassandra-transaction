@@ -44,6 +44,7 @@ public class GettingStarted {
 		d.Insert(2, 8, 1, 0.02);
 		*/
 		
+		/*
 		Customer c = new Customer(session);
 		c.Insert(1, 1, 2, "a2", "b2", "c2");
 		c.Insert(1, 1, 3, "a3", "b3", "c3");
@@ -52,7 +53,7 @@ public class GettingStarted {
 		c.Insert(1, 2, 6, "a2", "b2", "c2");
 		c.Insert(1, 2, 7, "a3", "b3", "c3");
 		c.Insert(1, 2, 8, "a4", "b4", "c4");
-		
+		*/
 		cluster.close();
 	}
 
