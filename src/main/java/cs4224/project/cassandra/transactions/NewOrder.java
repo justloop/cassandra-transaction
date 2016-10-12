@@ -156,7 +156,7 @@ public class NewOrder {
 		ResultSet results = session.execute(statement.bind(w_id, d_id));
 		Row district = results.one();
 		
-		int o_id = (int) district.getInt("d_next_oid");
+		int o_id = district.getInt("d_next_oid");
 		// Increment
 		statement = session.prepare("UPDATE district SET d_next_oid = ? WHERE w_id = ? AND d_id = ?");
 		session.execute(statement.bind(o_id + 1, w_id, d_id));
