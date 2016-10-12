@@ -39,7 +39,10 @@ public class WMTester {
 		//StockLevel.execute(session, 1, 1, 50, 5);
 		
 		// Test popular item
-		PopularItem.execute(session, 1, 1, 5);
+		//PopularItem.execute(session, 1, 1, 5);
+		
+		// Test top 10
+		TopBalance.execute(session);
 		
 		// Clean up
 		cluster.close();
