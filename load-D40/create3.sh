@@ -2,7 +2,7 @@
 
 /temp/apache-cassandra-3.7/bin/cqlsh <<EOF
 
-CREATE KEYSPACE d40 WITH replication = {'class':'SimpleStrategy', 'replication_factor':1};
+CREATE KEYSPACE d40 WITH replication = {'class':'SimpleStrategy', 'replication_factor':3};
 
 CREATE TABLE d40.warehouse( w_id int, w_ytd double, PRIMARY KEY(w_id));
 
@@ -18,7 +18,7 @@ CREATE TABLE d40.item (i_w_id int, i_id int, i_name text, i_price double, i_im_i
 
 CREATE INDEX order_carrier_index ON d40.order2(o_carrier_id);
 
-CREATE MATERIALIZED VIEW top10 AS SELECT c_balance, c_first, c_middle, c_last, w_name, d_name FROM customer WHERE w_id IS NOT NULL AND d_id IS NOT NULL AND c_id IS NOT NULL AND c_balance IS NOT NULL PRIMARY KEY (d_id, c_balance, w_id, c_id) WITH CLUSTERING ORDER BY (c_balance DESC);
+CREATE MATERIALIZED VIEW d40.top10 AS SELECT c_balance, c_first, c_middle, c_last, w_name, d_name FROM d40.customer WHERE w_id IS NOT NULL AND d_id IS NOT NULL AND c_id IS NOT NULL AND c_balance IS NOT NULL PRIMARY KEY (d_id, c_balance, w_id, c_id) WITH CLUSTERING ORDER BY (c_balance DESC);
 
 quit
 EOF
