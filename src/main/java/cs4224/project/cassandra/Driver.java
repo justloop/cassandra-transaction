@@ -85,9 +85,10 @@ public class Driver {
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
-
-        while(true) {
-            String input = sc.nextLine();
+        int totalExe = 0;
+        long lStartTime = System.nanoTime();
+        String input = null;
+        while((input = sc.nextLine()) != null) {
             String[] tokens = input.split(",");
 
             switch(tokens[0]) {
@@ -124,6 +125,16 @@ public class Driver {
 
                     return;
             }
+            totalExe++;
         }
+
+        long lEndTime = System.nanoTime();
+        long difference = lEndTime - lStartTime;
+
+
+        System.err.println("Total transactions: " + totalExe);
+        System.err.println("Total time elapsed in sec: " + (difference/1000));
+        System.err.println("Transaction throughput per sec: " + (totalExe * 1000 / difference));
+
     }
 }
