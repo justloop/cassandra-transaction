@@ -20,12 +20,12 @@ public class Delivery {
             for (Row row : result) {
                 //Update the order X by setting O CARRIER ID to CARRIER ID
                 order.UpdateCarrier(row.getInt("o_w_id"), row.getInt("o_d_id"), row.getInt("o_id"), carrier_id);
+                
                 Set<Orderline> temp = row.getSet("ols", Orderline.class);
                 double sum = 0.0;
 
                 for (Orderline j : temp)
                     sum += j.getAmount();
-                System.err.println("************IN LOOP**************" + sum);
                 customer.UpdateBalanceAndCount(row.getInt("o_w_id"), row.getInt("o_d_id"), row.getInt("o_c_id"), sum);
             }
         }

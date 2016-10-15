@@ -38,5 +38,19 @@ public class Order {
 				carrier_id, o_w_id, o_d_id, o_id);
 		System.out.println(query);
 		session.execute(query);
+		SelectById(o_w_id, o_d_id, o_id);
+	}
+	
+	public void SelectById(int o_w_id, int o_d_id, int o_id){
+		String query = String.format(
+				"select * from order2 where o_w_id = %d and o_d_id = %d and o_id = %d;",
+				o_w_id, o_d_id, o_id);
+		System.out.println(query);
+		ResultSet results = session.execute(query);
+		for (Row row : results) {
+			System.out.println("o_carrier_id after update: " + row.getInt("o_carrier_id"));
+			
+		}
+		
 	}
 }
