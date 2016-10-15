@@ -5,10 +5,10 @@ delivery = dict()
 orderToline = dict()
 with open('cassandra/order2.csv', 'wb') as f:  # output csv file
     writer = csv.writer(f)
-    with open('D8-data/order-line.csv', 'r') as orderlinefile:  # input csv file
-        with open('D8-data/order.csv', 'r') as orderfile:  # input csv file
-            with open('D8-data/customer.csv', 'r') as customerfile:  # input csv file
-                with open('D8-data/item.csv', 'r') as itemfile:  # input csv file
+    with open('D40-data/order-line.csv', 'r') as orderlinefile:  # input csv file
+        with open('D40-data/order.csv', 'r') as orderfile:  # input csv file
+            with open('D40-data/customer.csv', 'r') as customerfile:  # input csv file
+                with open('D40-data/item.csv', 'r') as itemfile:  # input csv file
                     orderlinedict = csv.DictReader(orderlinefile, delimiter=',')
                     orderdict = csv.DictReader(orderfile, delimiter=',')
                     itemdict = csv.DictReader(itemfile, delimiter=',')
@@ -30,12 +30,12 @@ with open('cassandra/order2.csv', 'wb') as f:  # output csv file
                     for order in orderdict:
                         #print "order =\n", order
                         customer = customerlist[int(order['O_C_ID']) - 1]
-                        orderlineStr = '['
+                        orderlineStr = '{'
                         for obj in orderToline[order['O_W_ID']+","+order['O_D_ID']+","+order['O_ID']]:
                             orderlineStr += obj + ","
                         if len(orderlineStr) > 1:
                             orderlineStr = orderlineStr.strip(',')
-                        orderlineStr += ']'
+                        orderlineStr += '}'
 			carrier_id = order['O_CARRIER_ID']
 			if carrier_id == 'null':
 				carrier_id = '-1'

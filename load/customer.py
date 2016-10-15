@@ -7,10 +7,10 @@ customerOrder = dict()
 districtTable = dict()
 with open('cassandra/customer.csv', 'wb') as f:  # output csv file
     writer = csv.writer(f)
-    with open('D8-data/warehouse.csv', 'r') as warehousefile:  # input csv file
-        with open('D8-data/district.csv', 'r') as districtfile:  # input csv file
-            with open('D8-data/customer.csv', 'r') as customerfile:  # input csv file
-                with open('D8-data/order.csv', 'r') as orderfile:  # input csv file
+    with open('D40-data/warehouse.csv', 'r') as warehousefile:  # input csv file
+        with open('D40-data/district.csv', 'r') as districtfile:  # input csv file
+            with open('D40-data/customer.csv', 'r') as customerfile:  # input csv file
+                with open('D40-data/order.csv', 'r') as orderfile:  # input csv file
                     warehousedict = csv.DictReader(warehousefile, delimiter=',')
                     warehouselist = list(warehousedict)
                     districtdict = csv.DictReader(districtfile, delimiter=',')

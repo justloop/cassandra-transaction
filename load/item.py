@@ -3,8 +3,8 @@ import csv
 
 with open('cassandra/item.csv', 'wb') as f:  # output csv file
     writer = csv.writer(f)
-    with open('D8-data/item.csv', 'r') as itemfile:  # input csv file
-        with open('D8-data/stock.csv', 'r') as stockfile:  # input csv file
+    with open('D40-data/item.csv', 'r') as itemfile:  # input csv file
+        with open('D40-data/stock.csv', 'r') as stockfile:  # input csv file
             itemdict = csv.DictReader(itemfile, delimiter=',')
             itemlist = list(itemdict)
             stockdict = csv.DictReader(stockfile, delimiter=',')
