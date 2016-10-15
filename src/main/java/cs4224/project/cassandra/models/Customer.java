@@ -42,7 +42,7 @@ public class Customer {
 	}
 	
 	public void UpdateBalanceAndCount(int w_id, int d_id, int c_id, double balance){
-		
+		ResultSet results;
 		Row temp = GetById(w_id, d_id, c_id);
 		System.out.println("Before balance: " + temp.getDouble("c_balance"));
 		if (temp != null){
@@ -55,10 +55,19 @@ public class Customer {
 				+ "w_id = %d and d_id = %d and c_id = %d;", c_delivery_cnt, c_balance - balance, w_id, d_id, c_id);
 			System.err.println(query);
 			try{
-				session.execute(query);
+				results = session.execute(query);
+				if (results.wasApplied()) {
+					return;
+				} else {
+					try {
+						Thread.sleep(100);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
 			}
 			catch(Exception e){
-				System.err.println("Exception: " + e);
+				e.printStackTrace();
 			}
 			
 			//test
