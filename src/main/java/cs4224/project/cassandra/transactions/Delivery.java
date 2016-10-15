@@ -3,7 +3,10 @@ package cs4224.project.cassandra.transactions;
 import java.util.Set;
 
 import com.datastax.driver.core.Cluster;
+<<<<<<< HEAD
 import com.datastax.driver.core.CodecRegistry;
+=======
+>>>>>>> skeleton
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -16,12 +19,15 @@ import cs4224.project.cassandra.models.Order;
 import cs4224.project.cassandra.models.Orderline;
 import cs4224.project.cassandra.models.OrderlineCodec;
 
+import cs4224.project.cassandra.models.Order;
+
 public class Delivery {
 
 	private Cluster cluster;
 	private Session session;
 	
 	public Delivery(){
+<<<<<<< HEAD
 		CodecRegistry codecRegistry = new CodecRegistry();
 		cluster = Cluster.builder().addContactPoint("localhost").withCodecRegistry(codecRegistry).build();
 		
@@ -35,6 +41,12 @@ public class Delivery {
 		System.out.println("Connected successfully...");
 		
 		
+=======
+		cluster = Cluster.builder().addContactPoint("localhost").build();
+		System.out.println("Trying to connect...");
+		session = cluster.connect("d8");
+		System.out.println("Connected successfully...");
+>>>>>>> skeleton
 	}
 	
 	public static void main(String[] args) {
@@ -65,14 +77,23 @@ public class Delivery {
 		• Increment C DELIVERY CNT by 1
 		*/
 		Order order = new Order(session);
+<<<<<<< HEAD
 		Customer customer = new Customer(session);
 		//TODO change back to 0 to 10
 		for(int i = 9; i <= 9; i++){
 			ResultSet result = order.SelectMin(w_id, i);
+=======
+		//TODO change back to 0 to 10
+		for(int i = 9; i <= 9; i++){
+			ResultSet result = order.SelectMin(w_id, i);
+			System.out.println("*******************");
+			System.out.println(result);
+>>>>>>> skeleton
 			//shuld have only one result
 			for (Row row : result) {
 				//Update the order X by setting O CARRIER ID to CARRIER ID
 				order.UpdateCarrier(row.getInt("o_w_id"), row.getInt("o_d_id"), row.getInt("o_id"), row.getInt("o_c_id"), carrier_id);
+<<<<<<< HEAD
 				
 				Set<Orderline> temp = row.getSet("ols", Orderline.class);
 				double sum = 0.0;
@@ -83,6 +104,8 @@ public class Delivery {
 				customer.UpdateBalanceAndCount(row.getInt("o_w_id"), row.getInt("o_d_id"), row.getInt("o_c_id"), sum);
 				System.err.println("************Finished**************");
 				
+=======
+>>>>>>> skeleton
 			}
 		}
 		

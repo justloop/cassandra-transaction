@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cqlsh <<EOF
+/temp/apache-cassandra-3.7/bin/cqlsh <<EOF
 USE d8;
 
 TRUNCATE warehouse;
@@ -22,7 +22,7 @@ COPY customer(w_id, d_id, c_id, c_first, c_middle, c_last, c_street_1, c_street_
 
 COPY order2(o_w_id, o_d_id, o_id, o_c_id, c_first, c_middle, c_last, o_carrier_id, o_ol_cnt, o_all_local, o_entry_d,ol_delivery_d, ols) FROM 'cassandra/order2.csv' WITH DELIMITER = ',' AND NULL = 'null';
 
-COPY item(i_w_id, i_id, i_name, i_price, i_im_id, i_data, s_quantity, s_ytd, s_order_cmt, s_remove_cmt,  s_dist_01, s_dist_02, s_dist_03, s_dist_04, s_dist_05, s_dist_06, s_dist_07, s_dist_08, s_dist_09, s_dist_10, s_data) FROM 'cassandra/item.csv' WITH DELIMITER = ',' AND NULL = 'null';
+COPY item(i_w_id, i_id, i_name, i_price, i_im_id, i_data, s_quantity, s_ytd, s_order_cnt, s_remove_cnt,  s_dist_01, s_dist_02, s_dist_03, s_dist_04, s_dist_05, s_dist_06, s_dist_07, s_dist_08, s_dist_09, s_dist_10, s_data) FROM 'cassandra/item.csv' WITH DELIMITER = ',' AND NULL = 'null';
 
 quit
 EOF
