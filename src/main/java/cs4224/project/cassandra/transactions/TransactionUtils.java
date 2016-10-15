@@ -1,15 +1,14 @@
 package cs4224.project.cassandra.transactions;
 
-import io.netty.util.internal.ThreadLocalRandom;
+import java.util.Random;
 
 public class TransactionUtils {
-	private static int lowerLimit = 50;
-	private static int upperLimit = 100;
+	private static Random rd = new Random();
 	
 	public static void randomSleep(){
 		
 		try {
-			Thread.sleep(ThreadLocalRandom.current().nextInt(lowerLimit, upperLimit));
+			Thread.sleep(50 + rd.nextInt(50));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
