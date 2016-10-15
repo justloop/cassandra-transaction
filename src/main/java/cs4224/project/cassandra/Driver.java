@@ -13,23 +13,26 @@ import java.util.concurrent.*;
  */
 public class Driver {
     private static Semaphore semaphore = new Semaphore(1000);
-    private static int numberOfThreads = 20;
+    private static final int numberOfThreads = 20;
+    private static final String defaultAddress = "localhost";
+    private static final String defaultKeyspace = "d8";
+
+    private static String keyspace = defaultKeyspace;
+
     private static ThreadPoolExecutor executor = null;
-
-
     private static Cluster cluster;
     private static Session session;
 
-    private static void init() {
+    private static void init(String address, String keyspace) {
         CodecRegistry codecRegistry = new CodecRegistry();
-        cluster = Cluster.builder().addContactPoint("localhost").withCodecRegistry(codecRegistry).build();
-        UserType orderlineType = cluster.getMetadata().getKeyspace("d8").getUserType("Orderline");
+        cluster = Cluster.builder().addContactPoint(address).withCodecRegistry(codecRegistry).build();
+        UserType orderlineType = cluster.getMetadata().getKeyspace(keyspace).getUserType("Orderline");
         TypeCodec<UDTValue> orderlineTypeCodec = codecRegistry.codecFor(orderlineType);
         OrderlineCodec orderlineCodec = new OrderlineCodec(orderlineTypeCodec, Orderline.class);
         codecRegistry.register(orderlineCodec);
 
         System.out.println("Trying to connect...");
-        session = cluster.connect("d8");
+        session = cluster.connect(keyspace);
         System.out.println("Connected successfully...");
     }
 
@@ -109,6 +112,13 @@ public class Driver {
             }
         };
 
+        if(args.length == 2) {
+            keyspace = args[1];
+            init(args[0], args[1]);
+        } else {
+            init(defaultAddress, defaultKeyspace);
+        }
+
         Scanner sc = new Scanner(System.in);
         int totalExe = 0;
         long lStartTime = System.nanoTime();
@@ -157,9 +167,9 @@ public class Driver {
         long difference = lEndTime - lStartTime;
 
 
-        System.err.println("Total transactions: " + totalExe);
-        System.err.println("Total time elapsed in sec: " + (difference/1000));
-        System.err.println("Transaction throughput per sec: " + (totalExe * 1000 / difference));
+        System.err.println("Total transactions:" + totalExe);
+        System.err.println("Total time elapsed in sec:" + (difference/1000));
+        System.err.println("Transaction throughput per sec:" + (totalExe * 1000 / difference));
         executor.shutdown();
         boolean isEnded = false;
         try {
