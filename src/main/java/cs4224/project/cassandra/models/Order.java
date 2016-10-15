@@ -31,11 +31,11 @@ public class Order {
 	
 	//pdate the order X by setting O CARRIER ID to CARRIER ID
 	//Update all the order-lines in X by setting OL DELIVERY D to the current date and time
-	public void UpdateCarrier(int o_w_id, int o_d_id, int o_id, int o_c_id, int carrier_id){
+	public void UpdateCarrier(int o_w_id, int o_d_id, int o_id, int carrier_id){
 		System.out.println("in UpdateCarrier..");
 		String query = String.format(
-				"UPDATE order2 set o_carrier_id = %d, ol_delivery_d = dateof(now()) where o_w_id = %d and o_d_id = %d and o_id = %d and o_c_id = %d;",
-				carrier_id, o_w_id, o_d_id, o_id, o_c_id);
+				"UPDATE order2 set o_carrier_id = %d, ol_delivery_d = dateof(now()) where o_w_id = %d and o_d_id = %d and o_id = %d;",
+				carrier_id, o_w_id, o_d_id, o_id);
 		System.out.println(query);
 		session.execute(query);
 	}
