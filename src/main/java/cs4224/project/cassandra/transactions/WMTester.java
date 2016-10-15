@@ -4,6 +4,11 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.DefaultRetryPolicy;
 
+/**
+ * Testing commit.
+ * @author chenweiming
+ *
+ */
 public class WMTester {
 	
 	public static void main(String[] args) {
