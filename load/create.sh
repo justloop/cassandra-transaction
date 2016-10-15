@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cqlsh <<EOF
+/temp/apache-cassandra-3.7/bin/cqlsh <<EOF
 
 CREATE KEYSPACE d8 WITH replication = {'class':'SimpleStrategy', 'replication_factor':1};
 
@@ -10,7 +10,7 @@ CREATE TABLE d8.warehouse( w_id int, w_ytd double, PRIMARY KEY(w_id));
 
 CREATE TABLE d8.district( w_id int, d_id int, d_next_oid counter, d_ytd double, PRIMARY KEY((w_id, d_id), d_ytd));
 
-CREATE TABLE d8.customer(w_id int, d_id int, c_id int, c_first text, c_middle text, c_last text, c_street_1 text, c_street_2 text, c_city text, c_state text, c_zip text, c_phone text, c_since timestamp, c_credit text, c_credit_lim double, c_discount double, c_balance double, c_ytd_payment float, c_payment_cnt int, c_delivery_cnt int, c_data text, w_name text, w_street_1 text, w_street_2 text, w_city text, w_state text, w_zip text, w_tax double, d_name text, d_street_1 text,  d_street_2 text, d_city text, d_state text, d_zip text, d_tax double, o_id int, PRIMARY KEY(w_id, d_id, c_id));
+CREATE TABLE d8.customer(w_id int, d_id int, c_id int, c_first text, c_middle text, c_last text, c_street_1 text, c_street_2 text, c_city text, c_state text, c_zip text, c_phone text, c_since timestamp, c_credit text, c_credit_lim double, c_discount double, c_balance double, c_ytd_payment float, c_payment_cnt int, c_delivery_cnt int, c_data text, w_name text, w_street_1 text, w_street_2 text, w_city text, w_state text, w_zip text, w_tax double, d_name text, d_street_1 text,  d_street_2 text, d_city text, d_state text, d_zip text, d_tax double, o_id int, PRIMARY KEY((w_id, d_id, c_id), c_balance)) WITH CLUSTERING ORDER BY (c_balance DESC);
 
 CREATE TYPE d8.orderline (ol_i_id int,ol_i_name text, ol_amount double,ol_supply_w_id int,ol_quantity int,ol_dist_info text);
 

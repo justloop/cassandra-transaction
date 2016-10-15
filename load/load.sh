@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cqlsh <<EOF
+/temp/apache-cassandra-3.7/bin/cqlsh <<EOF
 USE d8;
 
 TRUNCATE warehouse;

@@ -36,6 +36,9 @@ with open('cassandra/order2.csv', 'wb') as f:  # output csv file
                         if len(orderlineStr) > 1:
                             orderlineStr = orderlineStr.strip(',')
                         orderlineStr += ']'
-                        temp = order['O_W_ID'], order['O_D_ID'], order['O_ID'], order['O_C_ID'], customer['C_FIRST'], customer['C_MIDDLE'], customer['C_LAST'], order['O_CARRIER_ID'], order['O_OL_CNT'], order['O_ALL_LOCAL'], order['O_ENTRY_D'], delivery[(order['O_W_ID']+","+order['O_D_ID']+","+order['O_ID'])], orderlineStr
+			carrier_id = order['O_CARRIER_ID']
+			if carrier_id == 'null':
+				carrier_id = '-1'
+                        temp = order['O_W_ID'], order['O_D_ID'], order['O_ID'], order['O_C_ID'], customer['C_FIRST'], customer['C_MIDDLE'], customer['C_LAST'], carrier_id, order['O_OL_CNT'], order['O_ALL_LOCAL'], order['O_ENTRY_D'], delivery[(order['O_W_ID']+","+order['O_D_ID']+","+order['O_ID'])], orderlineStr
                         #print "temp =\n", temp
                         writer.writerow(temp)
