@@ -134,7 +134,7 @@ public class Driver {
 
         System.err.println("Total transactions: " + totalExe);
         System.err.println("Total time elapsed in sec: " + (difference/1000));
-        System.err.println("Transaction throughput per sec: " + (totalExe * 1000 / difference);
+        System.err.println("Transaction throughput per sec: " + (totalExe * 1000 / difference));
 
     }
 }
