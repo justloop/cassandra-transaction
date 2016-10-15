@@ -1,29 +1,39 @@
 package cs4224.project.cassandra;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
+import cs4224.project.cassandra.models.Orderline;
+import cs4224.project.cassandra.models.OrderlineCodec;
 import cs4224.project.cassandra.transactions.*;
 
 import java.util.Scanner;
+import java.util.concurrent.*;
 
 /**
  * Created by gejun on 15/10/16.
  */
 public class Driver {
+    private static Semaphore semaphore = new Semaphore(1000);
+    private static int numberOfThreads = 20;
+    private static ThreadPoolExecutor executor = null;
+
+
     private static Cluster cluster;
     private static Session session;
 
     private static void init() {
-        cluster = Cluster.builder().addContactPoint("127.0.0.1")
-	    /*.withSocketOptions(
-	      new SocketOptions()
-	        .setConnectTimeoutMillis(10000000)
-	        .setReadTimeoutMillis(10000000))*/
-                .build();
-        session = cluster.connect("D8");
+        CodecRegistry codecRegistry = new CodecRegistry();
+        cluster = Cluster.builder().addContactPoint("localhost").withCodecRegistry(codecRegistry).build();
+        UserType orderlineType = cluster.getMetadata().getKeyspace("d8").getUserType("Orderline");
+        TypeCodec<UDTValue> orderlineTypeCodec = codecRegistry.codecFor(orderlineType);
+        OrderlineCodec orderlineCodec = new OrderlineCodec(orderlineTypeCodec, Orderline.class);
+        codecRegistry.register(orderlineCodec);
+
+        System.out.println("Trying to connect...");
+        session = cluster.connect("d8");
+        System.out.println("Connected successfully...");
     }
 
-    private static boolean ProcessNewOrder(Scanner sc, String[] tokens) {
+    private static void ProcessNewOrder(Scanner sc, String[] tokens) {
         int c_id = Integer.parseInt(tokens[1]);
         int w_id = Integer.parseInt(tokens[2]);
         int d_id = Integer.parseInt(tokens[3]);
@@ -39,50 +49,65 @@ public class Driver {
             supply_w_ids[i] = Integer.parseInt(lineInput[1]);
             ol_quantities[i] = Integer.parseInt(lineInput[2]);
         }
-        return NewOrder.execute(session,w_id,d_id,c_id,n,ol_i_ids,supply_w_ids,ol_i_ids);
+
+        doSubmit(()->NewOrder.execute(session,w_id,d_id,c_id,n,ol_i_ids,supply_w_ids,ol_i_ids));
     }
 
-    private static boolean ProcessPayment(Scanner sc, String[] tokens) {
+    private static void ProcessPayment(Scanner sc, String[] tokens) {
         int c_w_id = Integer.parseInt(tokens[1]);
         int c_d_id = Integer.parseInt(tokens[2]);
         int c_id = Integer.parseInt(tokens[3]);
         double payment_amount = Double.parseDouble(tokens[4]);
-        return Payment.execute(session,c_w_id,c_d_id,c_id,payment_amount);
+        doSubmit(()->Payment.execute(session,c_w_id,c_d_id,c_id,payment_amount));
     }
 
-    private static boolean ProcessDelivery(Scanner sc, String[] tokens) {
+    private static void ProcessDelivery(Scanner sc, String[] tokens) {
         int w_id = Integer.parseInt(tokens[1]);
         int carrier_id = Integer.parseInt(tokens[2]);
-        return Delivery.execute(session,w_id,carrier_id);
+        doSubmit(()->Delivery.execute(session,w_id,carrier_id));
     }
 
-    private static boolean ProcessOrderStatus(Scanner sc, String[] tokens) {
+    private static void ProcessOrderStatus(Scanner sc, String[] tokens) {
         int c_w_id = Integer.parseInt(tokens[1]);
         int c_d_id = Integer.parseInt(tokens[2]);
         int c_id = Integer.parseInt(tokens[3]);
-        return OrderStatus.execute(session,c_w_id,c_d_id,c_id);
+        doSubmit(()->OrderStatus.execute(session,c_w_id,c_d_id,c_id));
     }
 
-    private static boolean ProcessStockLevel(Scanner sc, String[] tokens) {
+    private static void ProcessStockLevel(Scanner sc, String[] tokens) {
         int w_id = Integer.parseInt(tokens[1]);
         int d_id = Integer.parseInt(tokens[2]);
         int t = Integer.parseInt(tokens[3]);
         int l = Integer.parseInt(tokens[4]);
-        return StockLevel.execute(session,w_id,d_id,t,l);
+        doSubmit(()->StockLevel.execute(session,w_id,d_id,t,l));
     }
 
-    private static boolean ProcessPopularItem(Scanner sc, String[] tokens) {
+    private static void ProcessPopularItem(Scanner sc, String[] tokens) {
         int w_id = Integer.parseInt(tokens[1]);
         int d_id = Integer.parseInt(tokens[2]);
         int l = Integer.parseInt(tokens[3]);
-        return PopularItem.execute(session,w_id,d_id,l);
+        doSubmit(()->PopularItem.execute(session,w_id,d_id,l));
     }
 
-    private static boolean ProcessTopBalance(Scanner sc, String[] tokens) {
-        return TopBalance.execute(session);
+    private static void ProcessTopBalance(Scanner sc, String[] tokens) {
+        doSubmit(()->TopBalance.execute(session));
+    }
+
+    public static void doSubmit(Runnable r){
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        executor.submit(r);
     }
 
     public static void main(String[] args) {
+        executor = new ThreadPoolExecutor(5,10,60,TimeUnit.SECONDS,new LinkedBlockingQueue<>()){
+            protected void beforeExecute(Runnable r, Throwable t) {
+                semaphore.release();
+            }
+        };
 
         Scanner sc = new Scanner(System.in);
         int totalExe = 0;
@@ -135,6 +160,18 @@ public class Driver {
         System.err.println("Total transactions: " + totalExe);
         System.err.println("Total time elapsed in sec: " + (difference/1000));
         System.err.println("Transaction throughput per sec: " + (totalExe * 1000 / difference));
+        executor.shutdown();
+        boolean isEnded = false;
+        try {
+            isEnded = executor.awaitTermination(20000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(!isEnded) {
+            System.out.println("Executor was not shut down after timeout, not al tasks have been executed");
+            executor.shutdownNow();
+
+        }
 
     }
 }
