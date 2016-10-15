@@ -6,7 +6,7 @@ import glob
 import os
 
 folder = strftime("%Y%m%d%H%M%S", gmtime())
-if len(sys.argv) != 333:
+if len(sys.argv) != 3:
     print "usage is: benchmark.py keyspace clients_count."
     sys.exit()
 
@@ -20,7 +20,7 @@ clientsCount = arguments[2]
 print "Starting clients: ", clientsCount
 commands = []
 for i in range(int(clientsCount)):
-    commands.append("java cassandra-0.0.1-SNAPSHOT.jar cs4224.project.cassandra.Driver < " + keyspace + "-xact/" + str(i) + ".txt 2>&1 1>/dev/null > " + folder + "/" + str(i) + ".txt")
+    commands.append("java -cp 'driver.jar:driver_lib/*' cs4224.project.cassandra.Driver < " + keyspace + "-xact/" + str(i) + ".txt 2>&1 1>/dev/null > " + folder + "/" + str(i) + ".txt")
 procs = [Popen(c, shell=True, executable='/bin/bash') for c in commands]
 
 print "Wait until program finishes..."
