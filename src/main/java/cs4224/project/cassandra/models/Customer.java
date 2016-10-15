@@ -49,22 +49,27 @@ public class Customer {
 		System.out.println("Before balance: " + temp.getDouble("c_balance"));
 		if (temp != null){
 			//first fetch the current c_delivery count
+			int old_c_delivery_cnt = temp.getInt("c_delivery_cnt");
 			int c_delivery_cnt = temp.getInt("c_delivery_cnt") + 1;
 			double c_balance = temp.getDouble("c_balance");
 			System.out.println("Balance to be deduced: " + balance);
 			String query = String.format("UPDATE CUSTOMER set c_delivery_cnt = %d, "
 					+ "c_balance = %f where "
-				+ "w_id = %d and d_id = %d and c_id = %d;", c_delivery_cnt, c_balance - balance, w_id, d_id, c_id);
+				+ "w_id = %d and d_id = %d and c_id = %d if c_delivery_cnt = %d and c_balance = %f;", old_c_delivery_cnt, c_balance, c_delivery_cnt, c_balance - balance, w_id, d_id, c_id);
 			System.err.println(query);
+			
 			try{
-				results = session.execute(query);
-				if (results.wasApplied()) {
-					return;
-				} else {
-					try {
-						TransactionUtils.randomSleep();
-					} catch (Exception ex) {
-						ex.printStackTrace();
+				boolean flag = true;
+				while(flag){
+					results = session.execute(query);
+					if (results.wasApplied()) {
+						flag = false;
+					} else {
+						try {
+							TransactionUtils.randomSleep();
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
 					}
 				}
 			}
