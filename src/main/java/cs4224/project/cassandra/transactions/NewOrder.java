@@ -150,11 +150,7 @@ public class NewOrder {
 			if (results.wasApplied()) {
 				return o_id;
 			} else {
-				try {
-					Thread.sleep(100);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+				TransactionUtils.randomSleep();
 			}
 		}
 	}
@@ -193,11 +189,7 @@ public class NewOrder {
 			if (results.wasApplied()) {
 				return item;
 			} else {
-				try {
-					Thread.sleep(100);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+				TransactionUtils.randomSleep();
 			}
 		}		
 	}

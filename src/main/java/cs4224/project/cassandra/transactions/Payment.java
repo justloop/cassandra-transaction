@@ -98,11 +98,7 @@ public class Payment {
 			if (results.wasApplied()) {
 				return warehouse;
 			} else {
-				try {
-					Thread.sleep(100);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+				TransactionUtils.randomSleep();
 			}
 		}
 	}
@@ -128,11 +124,7 @@ public class Payment {
 			if (results.wasApplied()) {
 				return district;
 			} else {
-				try {
-					Thread.sleep(100);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+				TransactionUtils.randomSleep();
 			}
 		}
 	}
@@ -165,11 +157,7 @@ public class Payment {
 			if (results.wasApplied()) {
 				return customer;
 			} else {
-				try {
-					Thread.sleep(100);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+				TransactionUtils.randomSleep();
 			}
 		}
 	}
