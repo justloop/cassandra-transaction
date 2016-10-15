@@ -55,7 +55,7 @@ public class Customer {
 			System.out.println("Balance to be deduced: " + balance);
 			String query = String.format("UPDATE CUSTOMER set c_delivery_cnt = %d, "
 					+ "c_balance = %f where "
-				+ "w_id = %d and d_id = %d and c_id = %d if c_delivery_cnt = %d and c_balance = %f;", old_c_delivery_cnt, c_balance, c_delivery_cnt, c_balance - balance, w_id, d_id, c_id);
+				+ "w_id = %d and d_id = %d and c_id = %d if c_delivery_cnt = %d and c_balance = %f;", c_delivery_cnt, c_balance - balance, w_id, d_id, c_id, old_c_delivery_cnt, c_balance);
 			System.err.println(query);
 			
 			try{
