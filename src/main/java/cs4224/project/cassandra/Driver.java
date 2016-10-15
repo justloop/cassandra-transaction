@@ -17,7 +17,7 @@ public class Driver {
     private static final String defaultAddress = "localhost";
     private static final String defaultKeyspace = "d8";
 
-    private static String keyspace = defaultKeyspace;
+    public static String keyspace = defaultKeyspace;
 
     private static ThreadPoolExecutor executor = null;
     private static Cluster cluster;
