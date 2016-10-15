@@ -13,6 +13,8 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.UDTValue;
 import com.datastax.driver.core.UserType;
 
+import cs4224.project.cassandra.Driver;
+
 public class NewOrder {
 	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
@@ -81,7 +83,8 @@ public class NewOrder {
 			totalAmount += itemAmount;
 			
 			// Create Order line
-			UserType olType = session.getCluster().getMetadata().getKeyspace("d8").getUserType("orderline");
+			UserType olType = session.getCluster().getMetadata().getKeyspace(Driver.keyspace)
+					.getUserType("orderline");
 			UDTValue ol = olType.newValue().setInt("ol_i_id", itemNum[i])
 					.setString("ol_i_name", itemName)
 					.setDouble("ol_amount", itemAmount)

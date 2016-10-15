@@ -51,18 +51,17 @@ public class WMTester {
 		//Payment.execute(session, 1, 1, 1, 100);
 		
 		// Test delivery
-		Delivery.execute(session, 1, 100);
+		//Delivery.execute(session, 1, 100);
 		
-		/*
+		
 		// Test order status
 		OrderStatus.execute(session, 1, 1, 1);
-		*/
 		
 		// Test stock level
-		//StockLevel.execute(session, 1, 1, 50, 5);
+		//StockLevel.execute(session, 1, 1, 100, 5);
 		
 		// Test popular item
-		//PopularItem.execute(session, 1, 1, 5);
+		//PopularItem.execute(session, 2, 2, 10);
 		
 		// Test top 10
 		//TopBalance.execute(session);
