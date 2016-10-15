@@ -1,7 +1,7 @@
 #!/bin/bash
 
 /temp/apache-cassandra-3.7/bin/cqlsh <<EOF
-USE d8;
+USE d40;
 
 TRUNCATE warehouse;
 

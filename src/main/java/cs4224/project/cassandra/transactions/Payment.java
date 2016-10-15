@@ -13,6 +13,64 @@ public class Payment {
 	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	/**
+	 * Execute a payment transaction.
+	 * @param session
+	 * @param w_id
+	 * @param d_id
+	 * @param c_id
+	 * @param payment
+	 * @return
+	 */
+	public static boolean execute(Session session, int w_id, int d_id, int c_id, 
+			double payment) {
+		// Update warehouse
+		updateWarehouse(session, w_id, payment);
+		
+		// Update district
+		updateDistrict(session, w_id, d_id, payment);
+		
+		// Update customer
+		Row customer = updateCustomer(session, w_id, d_id, c_id, payment);
+		
+		System.out.println("C_W_ID:" + w_id);
+		System.out.println("C_D_ID:" + d_id);
+		System.out.println("C_ID:" + c_id);
+		
+		System.out.println("C_FIRST:" + customer.getString("c_first"));
+		System.out.println("C_MIDDLE:" + customer.getString("c_middle"));
+		System.out.println("C_LAST:" + customer.getString("c_last"));
+		
+		System.out.println("C_STREET_1:" + customer.getString("c_street_1"));
+		System.out.println("C_STREET_2:" + customer.getString("c_street_2"));
+		System.out.println("C_CITY:" + customer.getString("c_city"));
+		System.out.println("C_STATE:" + customer.getString("c_state"));
+		System.out.println("C_ZIP:" + customer.getString("c_zip"));
+		
+		System.out.println("C_PHONE:" + customer.getString("c_phone"));
+		System.out.println("C_SINCE:" + df.format(new Date(customer.getTimestamp("c_since").getTime())));
+		System.out.println("C_CREDIT:" + customer.getString("c_credit"));
+		System.out.println("C_REDIT_LIM:" + customer.getDouble("c_credit_lim"));
+		System.out.println("C_DISCOUNT:" + customer.getDouble("c_discount"));
+		System.out.println("C_BALANCE:" + customer.getDouble("c_balance"));
+		
+		System.out.println("W_STREET_1:" + customer.getString("w_street_1"));
+		System.out.println("W_STREET_2:" + customer.getString("w_street_2"));
+		System.out.println("W_CITY:" + customer.getString("w_city"));
+		System.out.println("W_STATE:" + customer.getString("w_state"));
+		System.out.println("W_ZIP:" + customer.getString("w_zip"));
+		
+		System.out.println("D_STREET_1:" + customer.getString("d_street_1"));
+		System.out.println("D_STREET_2:" + customer.getString("d_street_2"));
+		System.out.println("D_CITY:" + customer.getString("d_city"));
+		System.out.println("D_STATE:" + customer.getString("d_state"));
+		System.out.println("D_ZIP:" + customer.getString("d_zip"));
+		
+		System.out.println("PAYMENT:" + payment);
+		
+		return true;
+	}
+	
+	/**
 	 * Try until update pass.
 	 * @param session
 	 * @param w_id
@@ -114,64 +172,6 @@ public class Payment {
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Execute a payment transaction.
-	 * @param session
-	 * @param w_id
-	 * @param d_id
-	 * @param c_id
-	 * @param payment
-	 * @return
-	 */
-	public static boolean execute(Session session, int w_id, int d_id, int c_id, 
-			double payment) {
-		// Update warehouse
-		updateWarehouse(session, w_id, payment);
-		
-		// Update district
-		updateDistrict(session, w_id, d_id, payment);
-		
-		// Update customer
-		Row customer = updateCustomer(session, w_id, d_id, c_id, payment);
-		
-		System.out.println("C_W_ID:" + w_id);
-		System.out.println("C_D_ID:" + d_id);
-		System.out.println("C_ID:" + c_id);
-		
-		System.out.println("C_FIRST:" + customer.getString("c_first"));
-		System.out.println("C_MIDDLE:" + customer.getString("c_middle"));
-		System.out.println("C_LAST:" + customer.getString("c_last"));
-		
-		System.out.println("C_STREET_1:" + customer.getString("c_street_1"));
-		System.out.println("C_STREET_2:" + customer.getString("c_street_2"));
-		System.out.println("C_CITY:" + customer.getString("c_city"));
-		System.out.println("C_STATE:" + customer.getString("c_state"));
-		System.out.println("C_ZIP:" + customer.getString("c_zip"));
-		
-		System.out.println("C_PHONE:" + customer.getString("c_phone"));
-		System.out.println("C_SINCE:" + df.format(new Date(customer.getTimestamp("c_since").getTime())));
-		System.out.println("C_CREDIT:" + customer.getString("c_credit"));
-		System.out.println("C_REDIT_LIM:" + customer.getDouble("c_credit_lim"));
-		System.out.println("C_DISCOUNT:" + customer.getDouble("c_discount"));
-		System.out.println("C_BALANCE:" + customer.getDouble("c_balance"));
-		
-		System.out.println("W_STREET_1:" + customer.getString("w_street_1"));
-		System.out.println("W_STREET_2:" + customer.getString("w_street_2"));
-		System.out.println("W_CITY:" + customer.getString("w_city"));
-		System.out.println("W_STATE:" + customer.getString("w_state"));
-		System.out.println("W_ZIP:" + customer.getString("w_zip"));
-		
-		System.out.println("D_STREET_1:" + customer.getString("d_street_1"));
-		System.out.println("D_STREET_2:" + customer.getString("d_street_2"));
-		System.out.println("D_CITY:" + customer.getString("d_city"));
-		System.out.println("D_STATE:" + customer.getString("d_state"));
-		System.out.println("D_ZIP:" + customer.getString("d_zip"));
-		
-		System.out.println("PAYMENT:" + payment);
-		
-		return true;
 	}
 
 }

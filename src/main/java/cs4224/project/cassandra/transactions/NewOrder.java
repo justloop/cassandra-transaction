@@ -70,32 +70,12 @@ public class NewOrder {
 		for (int i = 0; i < numItems; i++) {
 			if (supplier[i] != w_id) o_all_local = 1;
 			
-			// Get item stock information
-			statement = session.prepare(
-				"SELECT i_name, i_price, s_quantity, s_ytd, s_order_cnt, s_remote_cnt " 
-						+ "FROM item WHERE i_w_id = ? AND i_id = ?"
-			);
-			results = session.execute(statement.bind(supplier[i], itemNum[i]));
-			Row item = results.one();
+			// Update stock
+			Row item = updateItemStock(session, w_id, itemNum[i], supplier[i], quantity[i]);
 			
 			String itemName = item.getString("i_name");
 			int s_quantity = item.getInt("s_quantity");
 			double i_price = item.getDouble("i_price");
-			double s_ytd = item.getDouble("s_ytd");
-			int s_order_cnt = item.getInt("s_order_cnt");
-			int s_remote_cnt = item.getInt("s_remote_cnt");
-			
-			// Adjust stock quantity
-			s_quantity -= quantity[i];
-			s_quantity = s_quantity < 10 ? s_quantity + 100 : s_quantity;
-			
-			// Update stock
-			statement = session.prepare(
-				"UPDATE item SET s_quantity = ?, s_ytd = ?, s_order_cnt = ?, s_remote_cnt = ? "
-					+ "WHERE i_w_id = ? AND i_id = ?"
-			);
-			session.execute(statement.bind(s_quantity, s_ytd + quantity[i], s_order_cnt + 1, 
-					s_remote_cnt + supplier[i] != w_id ? 1 : 0, supplier[i], itemNum[i]));
 			
 			double itemAmount = quantity[i] * i_price;
 			totalAmount += itemAmount;
@@ -151,17 +131,74 @@ public class NewOrder {
 	
 	// Get next order id and increment counter
 	private static int reserveNextOid(Session session, int w_id, int d_id) {
-		// Retrieve next oder id
-		PreparedStatement statement = session.prepare("SELECT d_next_oid FROM district WHERE w_id = ? AND d_id = ?");
-		ResultSet results = session.execute(statement.bind(w_id, d_id));
-		Row district = results.one();
+		PreparedStatement statement;
+		ResultSet results;
 		
-		int o_id = district.getInt("d_next_oid");
-		// Increment
-		statement = session.prepare("UPDATE district SET d_next_oid = ? WHERE w_id = ? AND d_id = ?");
-		session.execute(statement.bind(o_id + 1, w_id, d_id));
-		
-		return o_id;
+		while (true) {
+			// Retrieve next oder id
+			statement = session.prepare("SELECT d_next_oid FROM district WHERE w_id = ? AND d_id = ?");
+			results = session.execute(statement.bind(w_id, d_id));
+			Row district = results.one();
+			
+			int o_id = district.getInt("d_next_oid");
+			// Increment
+			statement = session.prepare(
+				"UPDATE district SET d_next_oid = ? WHERE w_id = ? AND d_id = ? IF d_next_oid = ?"
+			);
+			results = session.execute(statement.bind(o_id + 1, w_id, d_id, o_id));
+			
+			if (results.wasApplied()) {
+				return o_id;
+			} else {
+				try {
+					Thread.sleep(100);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
 	}
-
+	
+	private static Row updateItemStock(Session session, int w_id, int i_id, int supplier,
+			int quantity) {
+		PreparedStatement statement;
+		ResultSet results;
+		
+		while (true) {
+			// Get item stock information
+			statement = session.prepare(
+				"SELECT i_name, i_price, s_quantity, s_ytd, s_order_cnt, s_remote_cnt " 
+						+ "FROM item WHERE i_w_id = ? AND i_id = ?"
+			);
+			results = session.execute(statement.bind(supplier, i_id));
+			Row item = results.one();
+			
+			int s_quantity = item.getInt("s_quantity");
+			double s_ytd = item.getDouble("s_ytd");
+			int s_order_cnt = item.getInt("s_order_cnt");
+			int s_remote_cnt = item.getInt("s_remote_cnt");
+			
+			// Adjust stock quantity
+			s_quantity -= quantity;
+			s_quantity = s_quantity < 10 ? s_quantity + 100 : s_quantity;
+			
+			// Update stock
+			statement = session.prepare(
+				"UPDATE item SET s_quantity = ?, s_ytd = ?, s_order_cnt = ?, s_remote_cnt = ? "
+					+ "WHERE i_w_id = ? AND i_id = ? IF s_order_cnt = ?"
+			);
+			results = session.execute(statement.bind(s_quantity, s_ytd + quantity, s_order_cnt + 1, 
+					s_remote_cnt + supplier != w_id ? 1 : 0, supplier, i_id, s_order_cnt));
+			
+			if (results.wasApplied()) {
+				return item;
+			} else {
+				try {
+					Thread.sleep(100);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}		
+	}
 }
