@@ -4,6 +4,8 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
+import cs4224.project.cassandra.transactions.TransactionUtils;
+
 public class Customer {
 	private Session session;
 	private String tablename = "customer";
@@ -60,7 +62,7 @@ public class Customer {
 					return;
 				} else {
 					try {
-						Thread.sleep(100);
+						TransactionUtils.randomSleep();
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
