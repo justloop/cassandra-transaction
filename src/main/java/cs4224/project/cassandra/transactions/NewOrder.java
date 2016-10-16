@@ -172,6 +172,7 @@ public class NewOrder {
 			if (results.wasApplied()) {
 				return o_id;
 			} else {
+				System.out.println("Fail to update district");
 				TransactionUtils.randomSleep();
 			}
 		}
@@ -217,6 +218,7 @@ public class NewOrder {
 			if (results.wasApplied()) {
 				return item;
 			} else {
+				System.out.println("Fail to update stock");
 				TransactionUtils.randomSleep();
 			}
 		}		

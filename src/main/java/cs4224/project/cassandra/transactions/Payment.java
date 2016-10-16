@@ -94,16 +94,19 @@ public class Payment {
 			
 			if (updateWarehouse == null) {
 				updateWarehouse = session.prepare(
-					"UPDATE warehouse SET w_ytd = ? WHERE w_id = ? IF w_ytd = ?"
+					"UPDATE warehouse SET w_ytd = ? WHERE w_id = ? IF w_ytd > ? AND w_ytd < ?"
 				);
 			}
 			results = session.execute(updateWarehouse.bind(
-				warehouse.getDouble("w_ytd") + payment, w_id, warehouse.getDouble("w_ytd")
+				warehouse.getDouble("w_ytd") + payment, w_id, 
+				warehouse.getDouble("w_ytd") - 0.1,
+				warehouse.getDouble("w_ytd") + 0.1
 			));
 			
 			if (results.wasApplied()) {
 				return warehouse;
 			} else {
+				System.out.println("Fail to update warehouse");
 				TransactionUtils.randomSleep();
 			}
 		}
@@ -126,16 +129,19 @@ public class Payment {
 			
 			if (updateDistrict == null) {
 				updateDistrict = session.prepare(
-					"UPDATE district SET d_ytd = ? WHERE w_id = ? AND d_id = ? IF d_ytd = ?"
+					"UPDATE district SET d_ytd = ? WHERE w_id = ? AND d_id = ? IF d_ytd > ? AND d_ytd < ?"
 				);
 			}
 			session.execute(updateDistrict.bind(
-				district.getDouble("d_ytd") + payment, w_id, d_id, district.getDouble("d_ytd")
+				district.getDouble("d_ytd") + payment, w_id, d_id, 
+				district.getDouble("d_ytd") - 0.1,
+				district.getDouble("d_ytd") + 0.1
 			));
 			
 			if (results.wasApplied()) {
 				return district;
 			} else {
+				System.out.println("Fail to update district");
 				TransactionUtils.randomSleep();
 			}
 		}
@@ -175,6 +181,7 @@ public class Payment {
 			if (results.wasApplied()) {
 				return customer;
 			} else {
+				System.out.println("Fail to update customer");
 				TransactionUtils.randomSleep();
 			}
 		}
