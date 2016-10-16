@@ -7,34 +7,10 @@ import com.datastax.driver.core.Session;
 import cs4224.project.cassandra.transactions.TransactionUtils;
 
 public class Customer {
-	private Session session;
-	private String tablename = "customer";
+	public static String tablename = "customer";
 	
-	public Customer(Session session) {
-		this.session = session;
-	}
-	public void Insert(int w_id, int d_id, int c_id, String c_first, String c_middle, String c_last) {
-		String query = String.format("INSERT INTO " + tablename + 
-				" (w_id, d_id, c_id, c_first, c_middle, c_last) VALUES (%d, %d, %d, '%s', '%s', '%s');"
-				, w_id, d_id, c_id, c_first, c_middle, c_last);
-		System.out.println(query);
-		session.execute(query);
-	}
-	
-	public int GetDeliveryCountById(int w_id, int d_id, int c_id){
-		String query = String.format("SELECT * FROM CUSTOMER where w_id = %d and d_id = %d and c_id = %d;", w_id, d_id, c_id);
-		System.out.println(query);
-		int counter = -1;
-		ResultSet results = session.execute(query);
-		for (Row row : results) {
-			counter = row.getInt("c_delivery_cnt");
-		}
-		System.out.println("Counter gotten: " + counter);
-		return counter;
-	}
-	
-	public Row GetById(int w_id, int d_id, int c_id){
-		String query = String.format("SELECT * FROM CUSTOMER where w_id = %d and d_id = %d and c_id = %d;", w_id, d_id, c_id);
+	public static Row GetById(Session session, int w_id, int d_id, int c_id){
+		String query = String.format("SELECT c_delivery_cnt, c_balance FROM CUSTOMER where w_id = %d and d_id = %d and c_id = %d;", w_id, d_id, c_id);
 		System.out.println(query);
 		ResultSet results = session.execute(query);
 		for (Row row : results) {
@@ -43,9 +19,9 @@ public class Customer {
 		return null;
 	}
 	
-	public void UpdateBalanceAndCount(int w_id, int d_id, int c_id, double balance){
+	public static void UpdateBalanceAndCount(Session session, int w_id, int d_id, int c_id, double balance){
 		ResultSet results;
-		Row temp = GetById(w_id, d_id, c_id);
+		Row temp = GetById(session, w_id, d_id, c_id);
 		System.out.println("Before balance: " + temp.getDouble("c_balance"));
 		if (temp != null){
 			//first fetch the current c_delivery count
@@ -55,13 +31,14 @@ public class Customer {
 			System.out.println("Balance to be deduced: " + balance);
 			String query = String.format("UPDATE CUSTOMER set c_delivery_cnt = %d, "
 					+ "c_balance = %f where "
-				+ "w_id = %d and d_id = %d and c_id = %d if c_delivery_cnt = %d and c_balance = %f;", c_delivery_cnt, c_balance - balance, w_id, d_id, c_id, old_c_delivery_cnt, c_balance);
+				+ "w_id = %d and d_id = %d and c_id = %d if c_delivery_cnt = %d;"
+				, c_delivery_cnt, c_balance - balance, w_id, d_id, c_id, old_c_delivery_cnt);
 			System.out.println(query);
 			
 			try{
 				boolean flag = true;
 				int counter = 0;
-				while(flag && counter < 20){
+				while(flag && counter < 3){
 					counter++;
 					results = session.execute(query);
 					if (results.wasApplied()) {
@@ -78,10 +55,6 @@ public class Customer {
 			catch(Exception e){
 				e.printStackTrace();
 			}
-			
-			//test
-			temp = GetById(w_id, d_id, c_id);
-			System.out.println("Updated balance: " + temp.getDouble("c_balance"));
 		}
 	}
 }
