@@ -10,24 +10,27 @@ import com.datastax.driver.core.Session;
 
 public class TopBalance {
 	
+	private static PreparedStatement selectTop10;
+	
 	/**
 	 * Execute a top balance transaction.
 	 * @param session
 	 * @return
 	 */
 	public static boolean execute(Session session) {
-		PreparedStatement statement;
 		ResultSet results;
-		
 		// Top balance customers
 		List<Row> tops = new ArrayList<>();
 		
-		// Select top 10 at each district for all warehouses
-		for (int i = 1; i <= 10; i++) {
-			statement = session.prepare(
+		if (selectTop10 == null) {
+			selectTop10 = session.prepare(
 				"SELECT * FROM top10 WHERE d_id = ? LIMIT 10"
 			);
-			results = session.execute(statement.bind(i));
+		}
+		
+		// Select top 10 at each district for all warehouses
+		for (int i = 1; i <= 10; i++) {
+			results = session.execute(selectTop10.bind(i));
 			tops.addAll(results.all());
 		}
 		

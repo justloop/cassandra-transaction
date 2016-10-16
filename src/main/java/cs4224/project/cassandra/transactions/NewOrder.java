@@ -18,6 +18,11 @@ import cs4224.project.cassandra.Driver;
 public class NewOrder {
 	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
+	private static PreparedStatement selectCustomer;
+	private static PreparedStatement insertOrder;
+	private static PreparedStatement updateCustomer;
+	private static UserType olType;
+	
 	/**
 	 * Execute a new order request.
 	 * @param session
@@ -32,15 +37,17 @@ public class NewOrder {
 	 */
 	public static boolean execute(Session session, int w_id, int d_id, int c_id, 
 			int numItems, int[] itemNum, int[] supplier, int[] quantity) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		// Reserver next order id
 		int o_id = reserveNextOid(session, w_id, d_id);
 		
 		// Customer
-		statement = session.prepare("SELECT * FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?");
-		results = session.execute(statement.bind(w_id, d_id, c_id));
+		if (selectCustomer == null) {
+			selectCustomer = session.prepare("SELECT * FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?");
+		}
+		
+		results = session.execute(selectCustomer.bind(w_id, d_id, c_id));
 		Row consumer = results.one();
 		
 		String firstName = consumer.getString("c_first");
@@ -83,8 +90,10 @@ public class NewOrder {
 			totalAmount += itemAmount;
 			
 			// Create Order line
-			UserType olType = session.getCluster().getMetadata().getKeyspace(Driver.keyspace)
-					.getUserType("orderline");
+			if (olType == null) {
+				olType = session.getCluster().getMetadata().getKeyspace(Driver.keyspace)
+						.getUserType("orderline");
+			}
 			UDTValue ol = olType.newValue().setInt("ol_i_id", itemNum[i])
 					.setString("ol_i_name", itemName)
 					.setDouble("ol_amount", itemAmount)
@@ -105,24 +114,28 @@ public class NewOrder {
 		totalAmount = totalAmount * (1 + d_tax + w_tax) * (1 - c_discount);
 		
 		// Create a new order
-		statement = session.prepare("INSERT INTO order2 " 
-				+ "(o_w_id, o_d_id, o_id, o_c_id, c_first, c_middle, c_last, o_carrier_id, " 
-				+ "o_ol_cnt, o_all_local, o_entry_d, ols) "
-				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
-		);
+		if (insertOrder == null) {
+			insertOrder = session.prepare("INSERT INTO order2 " 
+					+ "(o_w_id, o_d_id, o_id, o_c_id, c_first, c_middle, c_last, o_carrier_id, " 
+					+ "o_ol_cnt, o_all_local, o_entry_d, ols) "
+					+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
+			);
+		}
 		
 		// Insert new order
 		Date o_entry_d = new Date(System.currentTimeMillis());
-		session.execute(statement.bind(
+		session.execute(insertOrder.bind(
 				w_id, d_id, o_id, c_id, firstName, middleName, lastName, -1,
 				numItems, o_all_local, o_entry_d, ols
 		));
 		
 		// Update consumer last order id
-		statement = session.prepare(
-			"UPDATE customer SET o_id = ? WHERE w_id = ? AND d_id = ? AND c_id = ?"
-		);
-		session.execute(statement.bind(o_id, w_id, d_id, c_id));
+		if (updateCustomer == null) {
+			updateCustomer = session.prepare(
+				"UPDATE customer SET o_id = ? WHERE w_id = ? AND d_id = ? AND c_id = ?"
+			);
+		}
+		session.execute(updateCustomer.bind(o_id, w_id, d_id, c_id));
 		
 		System.out.println("O_ID: " + o_id);
 		System.out.println("O_ENTRY_D: " + df.format(o_entry_d));
@@ -132,23 +145,29 @@ public class NewOrder {
 		return true;
 	}
 	
+	private static PreparedStatement selectDistrict;
+	private static PreparedStatement updateDistrict;
+	
 	// Get next order id and increment counter
 	private static int reserveNextOid(Session session, int w_id, int d_id) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		while (true) {
 			// Retrieve next oder id
-			statement = session.prepare("SELECT d_next_oid FROM district WHERE w_id = ? AND d_id = ?");
-			results = session.execute(statement.bind(w_id, d_id));
+			if (selectDistrict == null) {
+				selectDistrict = session.prepare("SELECT d_next_oid FROM district WHERE w_id = ? AND d_id = ?");
+			}
+			results = session.execute(selectDistrict.bind(w_id, d_id));
 			Row district = results.one();
 			
 			int o_id = district.getInt("d_next_oid");
 			// Increment
-			statement = session.prepare(
-				"UPDATE district SET d_next_oid = ? WHERE w_id = ? AND d_id = ? IF d_next_oid = ?"
-			);
-			results = session.execute(statement.bind(o_id + 1, w_id, d_id, o_id));
+			if (updateDistrict == null) {
+				updateDistrict = session.prepare(
+					"UPDATE district SET d_next_oid = ? WHERE w_id = ? AND d_id = ? IF d_next_oid = ?"
+				);
+			}
+			results = session.execute(updateDistrict.bind(o_id + 1, w_id, d_id, o_id));
 			
 			if (results.wasApplied()) {
 				return o_id;
@@ -158,18 +177,22 @@ public class NewOrder {
 		}
 	}
 	
+	private static PreparedStatement selectItem;
+	private static PreparedStatement updateItem;
+	
 	private static Row updateItemStock(Session session, int w_id, int i_id, int supplier,
 			int quantity) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		while (true) {
 			// Get item stock information
-			statement = session.prepare(
-				"SELECT i_name, i_price, s_quantity, s_ytd, s_order_cnt, s_remote_cnt " 
-						+ "FROM item WHERE i_w_id = ? AND i_id = ?"
-			);
-			results = session.execute(statement.bind(supplier, i_id));
+			if (selectItem == null) {
+				selectItem = session.prepare(
+					"SELECT i_name, i_price, s_quantity, s_ytd, s_order_cnt, s_remote_cnt " 
+							+ "FROM item WHERE i_w_id = ? AND i_id = ?"
+				);
+			}
+			results = session.execute(selectItem.bind(supplier, i_id));
 			Row item = results.one();
 			
 			int s_quantity = item.getInt("s_quantity");
@@ -182,11 +205,13 @@ public class NewOrder {
 			s_quantity = s_quantity < 10 ? s_quantity + 100 : s_quantity;
 			
 			// Update stock
-			statement = session.prepare(
-				"UPDATE item SET s_quantity = ?, s_ytd = ?, s_order_cnt = ?, s_remote_cnt = ? "
-					+ "WHERE i_w_id = ? AND i_id = ? IF s_order_cnt = ?"
-			);
-			results = session.execute(statement.bind(s_quantity, s_ytd + quantity, s_order_cnt + 1, 
+			if (updateItem == null) {
+				updateItem = session.prepare(
+					"UPDATE item SET s_quantity = ?, s_ytd = ?, s_order_cnt = ?, s_remote_cnt = ? "
+						+ "WHERE i_w_id = ? AND i_id = ? IF s_order_cnt = ?"
+				);
+			}
+			results = session.execute(updateItem.bind(s_quantity, s_ytd + quantity, s_order_cnt + 1, 
 					s_remote_cnt + supplier != w_id ? 1 : 0, supplier, i_id, s_order_cnt));
 			
 			if (results.wasApplied()) {

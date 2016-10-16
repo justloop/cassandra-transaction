@@ -14,6 +14,9 @@ import com.datastax.driver.core.UDTValue;
 public class OrderStatus {
 	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
+	private static PreparedStatement selectCustomer;
+	private static PreparedStatement selectOrder;
+	
 	/**
 	 * Execute an order status transaction.
 	 * @param session
@@ -23,15 +26,16 @@ public class OrderStatus {
 	 * @return
 	 */
 	public static boolean execute(Session session, int w_id, int d_id, int c_id) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		// Select the required customer
-		statement = session.prepare(
-			"SELECT c_first, c_middle, c_last, c_balance, o_id "
-				+ "FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?"
-		);
-		results = session.execute(statement.bind(w_id, d_id, c_id));
+		if (selectCustomer == null) {
+			selectCustomer = session.prepare(
+				"SELECT c_first, c_middle, c_last, c_balance, o_id "
+					+ "FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?"
+			);
+		}
+		results = session.execute(selectCustomer.bind(w_id, d_id, c_id));
 		Row customer = results.one();
 		
 		System.out.println("C_FIRST: " + customer.getString("c_first"));
@@ -42,12 +46,14 @@ public class OrderStatus {
 		// Find customer's last order
 		int o_id = customer.getInt("o_id");
 		
-		statement = session.prepare(
-			"SELECT o_entry_d, o_carrier_id, ol_delivery_d, ols "
-				+ "FROM order2 WHERE o_w_id = ? AND o_d_id = ? AND o_id = ? "
-				+ "LIMIT 1"
-		);
-		results = session.execute(statement.bind(w_id, d_id, o_id));
+		if (selectOrder == null) {
+			selectOrder = session.prepare(
+				"SELECT o_entry_d, o_carrier_id, ol_delivery_d, ols "
+					+ "FROM order2 WHERE o_w_id = ? AND o_d_id = ? AND o_id = ? "
+					+ "LIMIT 1"
+			);
+		}
+		results = session.execute(selectOrder.bind(w_id, d_id, o_id));
 		Row order = results.one();
 		
 		System.out.println("O_ID: " + o_id);

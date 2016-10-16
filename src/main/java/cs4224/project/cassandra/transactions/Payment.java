@@ -70,6 +70,9 @@ public class Payment {
 		return true;
 	}
 	
+	private static PreparedStatement selectWarehouse;
+	private static PreparedStatement updateWarehouse;
+	
 	/**
 	 * Try until update pass.
 	 * @param session
@@ -78,20 +81,23 @@ public class Payment {
 	 * @return
 	 */
 	private static Row updateWarehouse(Session session, int w_id, double payment) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		while (true) {
-			statement = session.prepare(
-				"SELECT * FROM warehouse WHERE w_id = ?"
-			);
-			results = session.execute(statement.bind(w_id));
+			if (selectWarehouse == null) {
+				selectWarehouse = session.prepare(
+					"SELECT * FROM warehouse WHERE w_id = ?"
+				);
+			}
+			results = session.execute(selectWarehouse.bind(w_id));
 			Row warehouse = results.one();
 			
-			statement = session.prepare(
-				"UPDATE warehouse SET w_ytd = ? WHERE w_id = ? IF w_ytd = ?"
-			);
-			results = session.execute(statement.bind(
+			if (updateWarehouse == null) {
+				updateWarehouse = session.prepare(
+					"UPDATE warehouse SET w_ytd = ? WHERE w_id = ? IF w_ytd = ?"
+				);
+			}
+			results = session.execute(updateWarehouse.bind(
 				warehouse.getDouble("w_ytd") + payment, w_id, warehouse.getDouble("w_ytd")
 			));
 			
@@ -103,21 +109,27 @@ public class Payment {
 		}
 	}
 	
+	private static PreparedStatement selectDistrict;
+	private static PreparedStatement updateDistrict;
+	
 	private static Row updateDistrict(Session session, int w_id, int d_id, double payment) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		while (true) {
-			statement = session.prepare(
-				"SELECT * FROM district WHERE w_id = ? AND d_id = ?"
-			);
-			results = session.execute(statement.bind(w_id, d_id));
+			if (selectDistrict == null) {
+				selectDistrict = session.prepare(
+					"SELECT * FROM district WHERE w_id = ? AND d_id = ?"
+				);
+			}
+			results = session.execute(selectDistrict.bind(w_id, d_id));
 			Row district = results.one();
 			
-			statement = session.prepare(
-				"UPDATE district SET d_ytd = ? WHERE w_id = ? AND d_id = ? IF d_ytd = ?"
-			);
-			session.execute(statement.bind(
+			if (updateDistrict == null) {
+				updateDistrict = session.prepare(
+					"UPDATE district SET d_ytd = ? WHERE w_id = ? AND d_id = ? IF d_ytd = ?"
+				);
+			}
+			session.execute(updateDistrict.bind(
 				district.getDouble("d_ytd") + payment, w_id, d_id, district.getDouble("d_ytd")
 			));
 			
@@ -129,24 +141,30 @@ public class Payment {
 		}
 	}
 	
+	private static PreparedStatement selectCustomer;
+	private static PreparedStatement updateCustomer;
+	
 	private static Row updateCustomer(Session session, int w_id, int d_id, int c_id, 
 			double payment) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		while (true) {
-			statement = session.prepare(
-				"SELECT * FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?"
-			);
-			results = session.execute(statement.bind(w_id, d_id, c_id));
+			if (selectCustomer == null) {
+				selectCustomer = session.prepare(
+					"SELECT * FROM customer WHERE w_id = ? AND d_id = ? AND c_id = ?"
+				);
+			}
+			results = session.execute(selectCustomer.bind(w_id, d_id, c_id));
 			Row customer = results.one();
 			
-			statement = session.prepare(
-				"UPDATE customer SET c_balance = ?, c_ytd_payment = ?, c_payment_cnt = ? "
-						+ "WHERE w_id = ? AND d_id = ? AND c_id = ? "
-						+ "IF c_payment_cnt = ?"
-			);
-			session.execute(statement.bind(
+			if (updateCustomer == null) {
+				updateCustomer = session.prepare(
+					"UPDATE customer SET c_balance = ?, c_ytd_payment = ?, c_payment_cnt = ? "
+							+ "WHERE w_id = ? AND d_id = ? AND c_id = ? "
+							+ "IF c_payment_cnt = ?"
+				);
+			}
+			session.execute(updateCustomer.bind(
 				customer.getDouble("c_balance") - payment,
 				customer.getDouble("c_ytd_payment") + payment,
 				customer.getInt("c_payment_cnt") + 1,

@@ -18,6 +18,9 @@ import com.datastax.driver.core.UDTValue;
 public class PopularItem {
 	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
+	private static PreparedStatement selectDistrict;
+	private static PreparedStatement selectOrders;
+	
 	/**
 	 * Execute a popular item transaction.
 	 * @param session
@@ -27,7 +30,6 @@ public class PopularItem {
 	 * @return
 	 */
 	public static boolean execute(Session session, int w_id, int d_id, int l) {
-		PreparedStatement statement;
 		ResultSet results;
 		
 		System.out.println("W_ID: " + w_id);
@@ -35,17 +37,21 @@ public class PopularItem {
 		System.out.println("Number of last orders to be examined: " + l);
 		
 		// Find next available order id
-		statement = session.prepare("SELECT d_next_oid FROM district WHERE w_id = ? AND d_id = ?");
-		results = session.execute(statement.bind(w_id, d_id));
+		if (selectDistrict == null) {
+			selectDistrict = session.prepare("SELECT d_next_oid FROM district WHERE w_id = ? AND d_id = ?");
+		}
+		results = session.execute(selectDistrict.bind(w_id, d_id));
 		Row district = results.one();
 		
 		int d_next_oid = district.getInt("d_next_oid");
 		
 		// Find last L orders
-		statement = session.prepare(
-			"SELECT * FROM order2 WHERE o_w_id = ? AND o_d_id = ? AND o_id >= ? AND o_id < ?"
-		);
-		results = session.execute(statement.bind(w_id, d_id, d_next_oid - l, d_next_oid));
+		if (selectOrders == null) {
+			selectOrders = session.prepare(
+				"SELECT * FROM order2 WHERE o_w_id = ? AND o_d_id = ? AND o_id >= ? AND o_id < ?"
+			);
+		}
+		results = session.execute(selectOrders.bind(w_id, d_id, d_next_oid - l, d_next_oid));
 		
 		// Distinct popular items
 		Set<String> popItems = new HashSet<>();
