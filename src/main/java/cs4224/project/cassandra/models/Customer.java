@@ -60,7 +60,9 @@ public class Customer {
 			
 			try{
 				boolean flag = true;
-				while(flag){
+				int counter = 0;
+				while(flag && counter < 20){
+					counter++;
 					results = session.execute(query);
 					if (results.wasApplied()) {
 						flag = false;
