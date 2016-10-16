@@ -51,7 +51,7 @@ public class WMTester {
 		//Payment.execute(session, 1, 1, 1, 100);
 		
 		// Test delivery
-		Delivery.execute(session, 5, 100);
+		Delivery.execute(session, 1, 100);
 		
 		
 		// Test order status
