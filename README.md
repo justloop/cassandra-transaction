@@ -1,6 +1,7 @@
 # cs4224
 
 ## Code structure
+Code can be open with Intellij or Eclipse with Java8 (lambda level) and Maven3
 ```
 ├── load-D8|D40: the scripts to create/drop keyspace, generate loadable csv from original data, load data into cassandra
     ├── schema: the original data csv schema, we put this header to all the original data
@@ -30,7 +31,7 @@
 
 ## Configuration and run program
 1. Compile the program:
-    Create a runnable jar, and get all the jar libs into a separate files. Put the driver.jar (compiled jar) and driver_lib/ (the lib jars) under benchmark/ folder
+    Open with Intellij or Eclipse, import as Maven projects with Java 8 as environment, make sure you can pull the maven dependencies from internet. If you don't need to change code, you can use the compiled code from benchmark folder. To regenerate, you can create a runnable jar from Intellij or Eclipse and get all the jar libs into a separate files. Put the driver.jar (compiled jar) and driver_lib/ (the lib jars) under benchmark/ folder
 
 2. Generate the input files:
     Download the data files, put into corresponding load-D8/D8-data or load-D40/D40-data folder, input the schema header into the first line of each data file
