@@ -8,7 +8,7 @@ public class TransactionUtils {
 	public static void randomSleep(){
 		
 		try {
-			Thread.sleep(10 + rd.nextInt(30));
+			Thread.sleep(10 + rd.nextInt(20));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
