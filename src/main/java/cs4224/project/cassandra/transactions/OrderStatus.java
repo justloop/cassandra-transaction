@@ -38,10 +38,10 @@ public class OrderStatus {
 		results = session.execute(selectCustomer.bind(w_id, d_id, c_id));
 		Row customer = results.one();
 		
-		System.out.println("C_FIRST: " + customer.getString("c_first"));
-		System.out.println("C_MIDDLE: " + customer.getString("c_middle"));
-		System.out.println("C_LAST: " + customer.getString("c_last"));
-		System.out.println("C_BALANCE: " + customer.getDouble("c_balance"));
+		//System.out.println("C_FIRST: " + customer.getString("c_first"));
+		//System.out.println("C_MIDDLE: " + customer.getString("c_middle"));
+		//System.out.println("C_LAST: " + customer.getString("c_last"));
+		//System.out.println("C_BALANCE: " + customer.getDouble("c_balance"));
 		
 		// Find customer's last order
 		int o_id = customer.getInt("o_id");
@@ -56,24 +56,24 @@ public class OrderStatus {
 		results = session.execute(selectOrder.bind(w_id, d_id, o_id));
 		Row order = results.one();
 		
-		System.out.println("O_ID: " + o_id);
-		System.out.println("O_ENTRY_D: " + df.format(order.getTimestamp("o_entry_d")));
-		System.out.println("O_CARRIER_ID: " + order.getInt("o_carrier_id"));
+		//System.out.println("O_ID: " + o_id);
+		//System.out.println("O_ENTRY_D: " + df.format(order.getTimestamp("o_entry_d")));
+		//System.out.println("O_CARRIER_ID: " + order.getInt("o_carrier_id"));
 		
 		Date ol_delivery_d = order.getTimestamp("ol_delivery_d");
 		
 		// List each item
 		Set<UDTValue> orderlines = order.getSet("ols", UDTValue.class);
 		for (UDTValue item : orderlines) {
-			System.out.println("OL_I_ID: " + item.getInt("ol_i_id"));
-			System.out.println("OL_SUPPLY_W_ID: " + item.getInt("ol_supply_w_id"));
-			System.out.println("OL_QUANTITY: " + item.getInt("ol_quantity"));
-			System.out.println("OL_AMOUNT: " + item.getDouble("ol_amount"));
+			//System.out.println("OL_I_ID: " + item.getInt("ol_i_id"));
+			//System.out.println("OL_SUPPLY_W_ID: " + item.getInt("ol_supply_w_id"));
+			//System.out.println("OL_QUANTITY: " + item.getInt("ol_quantity"));
+			//System.out.println("OL_AMOUNT: " + item.getDouble("ol_amount"));
 			
 			if (ol_delivery_d != null) {
-				System.out.println("OL_DELIVERY_D: " + df.format(ol_delivery_d));
+				//System.out.println("OL_DELIVERY_D: " + df.format(ol_delivery_d));
 			} else {
-				System.out.println("OL_DELIVERY_D: NA");
+				//System.out.println("OL_DELIVERY_D: NA");
 			}
 		}
 		

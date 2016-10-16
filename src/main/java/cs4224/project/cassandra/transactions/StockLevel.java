@@ -68,7 +68,7 @@ public class StockLevel {
 			}
 		}
 		
-		System.out.println("Total number of items where stock is lower than threshould: " + items.size());
+		//System.out.println("Total number of items where stock is lower than threshould: " + items.size());
 		
 		return true;
 	}

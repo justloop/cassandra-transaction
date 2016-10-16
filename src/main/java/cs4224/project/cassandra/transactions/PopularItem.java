@@ -32,9 +32,9 @@ public class PopularItem {
 	public static boolean execute(Session session, int w_id, int d_id, int l) {
 		ResultSet results;
 		
-		System.out.println("W_ID: " + w_id);
-		System.out.println("D_ID: " + d_id);
-		System.out.println("Number of last orders to be examined: " + l);
+		//System.out.println("W_ID: " + w_id);
+		//System.out.println("D_ID: " + d_id);
+		//System.out.println("Number of last orders to be examined: " + l);
 		
 		// Find next available order id
 		if (selectDistrict == null) {
@@ -59,12 +59,12 @@ public class PopularItem {
 		List<Set<String>> orderItems = new ArrayList<>();
 		
 		for (Row order : results) {
-			System.out.println("O_ID: " + order.getInt("o_id"));
-			System.out.println("O_ENTRY_D: " + df.format(order.getTimestamp("o_entry_d")));
+			//System.out.println("O_ID: " + order.getInt("o_id"));
+			//System.out.println("O_ENTRY_D: " + df.format(order.getTimestamp("o_entry_d")));
 			
-			System.out.println("C_FIRST: " + order.getString("c_first"));
-			System.out.println("C_MIDDLE: " + order.getString("c_middle"));
-			System.out.println("C_LAST: " + order.getString("c_last"));
+			//System.out.println("C_FIRST: " + order.getString("c_first"));
+			//System.out.println("C_MIDDLE: " + order.getString("c_middle"));
+			//System.out.println("C_LAST: " + order.getString("c_last"));
 			
 			// Find most popular items in this order
 			int max = 0;
@@ -88,8 +88,8 @@ public class PopularItem {
 			}
 			
 			for (String item : items) {
-				System.out.println("I_NAME: " + item);
-				System.out.println("OL_QUANTITY: " + max);
+				//System.out.println("I_NAME: " + item);
+				//System.out.println("OL_QUANTITY: " + max);
 			}
 			
 			popItems.addAll(items);
@@ -108,9 +108,9 @@ public class PopularItem {
 		}
 		
 		for (Map.Entry<String, Integer> entry : counterMap.entrySet()) {
-			System.out.println("I_NAME: " + entry.getKey());
+			//System.out.println("I_NAME: " + entry.getKey());
 			float percentage = entry.getValue() * 100.0f / orderItems.size();
-			System.out.println("Percentage: " + percentage + "%");
+			//System.out.println("Percentage: " + percentage + "%");
 		}
 		
 		return true;
