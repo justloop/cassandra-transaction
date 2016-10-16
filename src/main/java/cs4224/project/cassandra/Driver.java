@@ -13,20 +13,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by gejun on 15/10/16.
  */
 public class Driver {
-    private static Semaphore semaphore = new Semaphore(1000);
-    private static AtomicInteger counter = new AtomicInteger(0);
-    private static final int numberOfThreads = 20;
-    private static final String defaultAddress = "localhost";
     private static final String defaultKeyspace = "d8";
 
     public static String keyspace = defaultKeyspace;
-    private static ThreadPoolExecutor executor = null;
     private static Cluster cluster;
     private static Session session;
 
-    private static void init(String address, String keyspace) {
+    private static void init(String keyspace) {
         CodecRegistry codecRegistry = new CodecRegistry();
-        cluster = Cluster.builder().addContactPoint(address).withCodecRegistry(codecRegistry).build();
+        cluster = Cluster.builder().addContactPoints("localhost").withCodecRegistry(codecRegistry).withSocketOptions(new SocketOptions()
+                .setConnectTimeoutMillis(2000).setReadTimeoutMillis(2000)).build();
         UserType orderlineType = cluster.getMetadata().getKeyspace(keyspace).getUserType("Orderline");
         TypeCodec<UDTValue> orderlineTypeCodec = codecRegistry.codecFor(orderlineType);
         OrderlineCodec orderlineCodec = new OrderlineCodec(orderlineTypeCodec, Orderline.class);
@@ -99,11 +95,10 @@ public class Driver {
     public static void main(String[] args) throws InterruptedException {
         if(args.length == 2) {
             keyspace = args[1];
-            init(args[0], args[1]);
+            init(args[1]);
         } else {
-            init(defaultAddress, defaultKeyspace);
+            init(defaultKeyspace);
         }
-
         Scanner sc = new Scanner(System.in);
         int totalExe = 0;
         long lStartTime = System.currentTimeMillis();
@@ -113,37 +108,42 @@ public class Driver {
 
             switch(tokens[0]) {
                 case "N":
-                    System.out.println("New Order Transaction chosen");
+                    System.out.println("New Order Transaction chosen:" + input);
                     ProcessNewOrder(sc, tokens);
+                    System.out.println("New Order Transaction succeed");
                     break;
                 case "P":
-                    System.out.println("Payment Transaction chosen");
+                    System.out.println("Payment Transaction chosen:" + input);
                     ProcessPayment(sc, tokens);
+                    System.out.println("Payment Transaction succeed");
                     break;
                 case "D":
-                    System.out.println("Delivery Transaction chosen");
+                    System.out.println("Delivery Transaction chosen:" + input);
                     ProcessDelivery(sc, tokens);
+                    System.out.println("Delivery Transaction succeed");
                     break;
                 case "O":
-                    System.out.println("Order-Status Transaction chosen");
+                    System.out.println("Order-Status Transaction chosen:" + input);
                     ProcessOrderStatus(sc, tokens);
+                    System.out.println("Order-Status Transaction succeed");
                     break;
                 case "S":
-                    System.out.println("Stock-Level Transaction chosen");
+                    System.out.println("Stock-Level Transaction chosen:" + input);
                     ProcessStockLevel(sc, tokens);
+                    System.out.println("Stock-Level Transaction succeed");
                     break;
                 case "I":
-                    System.out.println("Popular-Item Transaction chosen");
+                    System.out.println("Popular-Item Transaction chosen:" + input);
                     ProcessPopularItem(sc, tokens);
+                    System.out.println("Popular-Item Transaction succeed");
                     break;
                 case "T":
-                    System.out.println("Top-Balance Transaction chosen");
+                    System.out.println("Top-Balance Transaction chosen:" + input);
                     ProcessTopBalance(sc, tokens);
+                    System.out.println("Top-Balance Transaction succeed");
                     break;
                 default:
                     System.out.println("This is not a valid option.");
-
-                    return;
             }
             totalExe++;
         }
@@ -151,10 +151,12 @@ public class Driver {
         long lEndTime = System.currentTimeMillis();
         long difference = lEndTime - lStartTime;
 
-
         System.err.println("Total transactions:" + totalExe);
         System.err.println("Total time elapsed in sec:" + (difference/1000));
         System.err.println("Transaction throughput per sec:" + (totalExe * 1000 / difference));
+        System.out.println("Start session close");
+        session.close();
         cluster.close();
+        System.out.println("Driver closed");
     }
 }
