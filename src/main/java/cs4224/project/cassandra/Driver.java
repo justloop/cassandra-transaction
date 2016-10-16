@@ -105,45 +105,49 @@ public class Driver {
         while(sc.hasNextLine()) {
             String input = sc.nextLine();
             String[] tokens = input.split(",");
-
-            switch(tokens[0]) {
-                case "N":
-                    System.out.println("New Order Transaction chosen:" + input);
-                    ProcessNewOrder(sc, tokens);
-                    System.out.println("New Order Transaction succeed");
-                    break;
-                case "P":
-                    System.out.println("Payment Transaction chosen:" + input);
-                    ProcessPayment(sc, tokens);
-                    System.out.println("Payment Transaction succeed");
-                    break;
-                case "D":
-                    System.out.println("Delivery Transaction chosen:" + input);
-                    ProcessDelivery(sc, tokens);
-                    System.out.println("Delivery Transaction succeed");
-                    break;
-                case "O":
-                    System.out.println("Order-Status Transaction chosen:" + input);
-                    ProcessOrderStatus(sc, tokens);
-                    System.out.println("Order-Status Transaction succeed");
-                    break;
-                case "S":
-                    System.out.println("Stock-Level Transaction chosen:" + input);
-                    ProcessStockLevel(sc, tokens);
-                    System.out.println("Stock-Level Transaction succeed");
-                    break;
-                case "I":
-                    System.out.println("Popular-Item Transaction chosen:" + input);
-                    ProcessPopularItem(sc, tokens);
-                    System.out.println("Popular-Item Transaction succeed");
-                    break;
-                case "T":
-                    System.out.println("Top-Balance Transaction chosen:" + input);
-                    ProcessTopBalance(sc, tokens);
-                    System.out.println("Top-Balance Transaction succeed");
-                    break;
-                default:
-                    System.out.println("This is not a valid option.");
+            try {
+                switch (tokens[0]) {
+                    case "N":
+                        System.out.println("New Order Transaction chosen:" + input);
+                        ProcessNewOrder(sc, tokens);
+                        System.out.println("New Order Transaction succeed");
+                        break;
+                    case "P":
+                        System.out.println("Payment Transaction chosen:" + input);
+                        ProcessPayment(sc, tokens);
+                        System.out.println("Payment Transaction succeed");
+                        break;
+                    case "D":
+                        System.out.println("Delivery Transaction chosen:" + input);
+                        ProcessDelivery(sc, tokens);
+                        System.out.println("Delivery Transaction succeed");
+                        break;
+                    case "O":
+                        System.out.println("Order-Status Transaction chosen:" + input);
+                        ProcessOrderStatus(sc, tokens);
+                        System.out.println("Order-Status Transaction succeed");
+                        break;
+                    case "S":
+                        System.out.println("Stock-Level Transaction chosen:" + input);
+                        ProcessStockLevel(sc, tokens);
+                        System.out.println("Stock-Level Transaction succeed");
+                        break;
+                    case "I":
+                        System.out.println("Popular-Item Transaction chosen:" + input);
+                        ProcessPopularItem(sc, tokens);
+                        System.out.println("Popular-Item Transaction succeed");
+                        break;
+                    case "T":
+                        System.out.println("Top-Balance Transaction chosen:" + input);
+                        ProcessTopBalance(sc, tokens);
+                        System.out.println("Top-Balance Transaction succeed");
+                        break;
+                    default:
+                        System.out.println("This is not a valid option.");
+                }
+            } catch (Exception e) {
+                System.err.println("Err processing "+input +" :"+e.getMessage());
+                e.printStackTrace(System.out);
             }
             totalExe++;
         }
