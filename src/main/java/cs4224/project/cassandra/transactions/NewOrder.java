@@ -58,15 +58,15 @@ public class NewOrder {
 		double w_tax = consumer.getDouble("w_tax");
 		double d_tax = consumer.getDouble("d_tax");
 		
-		//System.out.println("W_ID: " + w_id);
-		//System.out.println("D_ID: " + d_id);
-		//System.out.println("C_ID: " + c_id);
-		//System.out.println("C_LAST: " + lastName);
-		//System.out.println("C_CREDIT: " + c_credit);
-		//System.out.println("C_DISCOUNT: " + c_discount);
+		System.out.println("W_ID: " + w_id);
+		System.out.println("D_ID: " + d_id);
+		System.out.println("C_ID: " + c_id);
+		System.out.println("C_LAST: " + lastName);
+		System.out.println("C_CREDIT: " + c_credit);
+		System.out.println("C_DISCOUNT: " + c_discount);
 		
-		//System.out.println("W_TAX: " + w_tax);
-		//System.out.println("D_TAX: " + d_tax);
+		System.out.println("W_TAX: " + w_tax);
+		System.out.println("D_TAX: " + d_tax);
 		
 		// All local ?
 		int o_all_local = 0;
@@ -102,12 +102,12 @@ public class NewOrder {
 					;
 			ols.add(ol);
 			
-			//System.out.println("ITEM_NUMBER: " + itemNum[i]);
-			//System.out.println("I_NAME: " + itemName);
-			//System.out.println("SUPPLIER_WARHOUSE: " + supplier[i]);
-			//System.out.println("QUANTITY: " + quantity[i]);
-			//System.out.println("OL_AMOUNT: " + itemAmount);
-			//System.out.println("S_QUANTITY: " + s_quantity);
+			System.out.println("ITEM_NUMBER: " + itemNum[i]);
+			System.out.println("I_NAME: " + itemName);
+			System.out.println("SUPPLIER_WARHOUSE: " + supplier[i]);
+			System.out.println("QUANTITY: " + quantity[i]);
+			System.out.println("OL_AMOUNT: " + itemAmount);
+			System.out.println("S_QUANTITY: " + s_quantity);
 		}
 		
 		// Calculate total amount
@@ -137,10 +137,10 @@ public class NewOrder {
 		}
 		session.execute(updateCustomer.bind(o_id, w_id, d_id, c_id));
 		
-		//System.out.println("O_ID: " + o_id);
-		//System.out.println("O_ENTRY_D: " + df.format(o_entry_d));
-		//System.out.println("NUM_ITEMS: " + numItems);
-		//System.out.println("TOTAL_AMOUNT: " + totalAmount);
+		System.out.println("O_ID: " + o_id);
+		System.out.println("O_ENTRY_D: " + df.format(o_entry_d));
+		System.out.println("NUM_ITEMS: " + numItems);
+		System.out.println("TOTAL_AMOUNT: " + totalAmount);
 		
 		return true;
 	}
@@ -172,7 +172,7 @@ public class NewOrder {
 			if (results.wasApplied()) {
 				return o_id;
 			} else {
-				//System.out.println("Fail to update district");
+				System.out.println("Fail to update district");
 				TransactionUtils.randomSleep();
 			}
 		}
@@ -218,7 +218,7 @@ public class NewOrder {
 			if (results.wasApplied()) {
 				return item;
 			} else {
-				//System.out.println("Fail to update stock");
+				System.out.println("Fail to update stock");
 				TransactionUtils.randomSleep();
 			}
 		}		

@@ -38,8 +38,8 @@ public class TopBalance {
 		tops.sort((o1, o2) -> Double.compare(o2.getDouble("c_balance"), o1.getDouble("c_balance")));
 		for (int i = 0; i < 10 && i < tops.size(); i++) {
 			Row customer = tops.get(i);
-			//System.out.println("C_ID: " + customer.getInt("c_id"));
-			//System.out.println("C_BALANCE: " + customer.getDouble("c_balance"));
+			System.out.println("C_ID: " + customer.getInt("c_id"));
+			System.out.println("C_BALANCE: " + customer.getDouble("c_balance"));
 		}
 		
 		return true;

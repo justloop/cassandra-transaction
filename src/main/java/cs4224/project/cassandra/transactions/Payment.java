@@ -32,40 +32,40 @@ public class Payment {
 		// Update customer
 		Row customer = updateCustomer(session, w_id, d_id, c_id, payment);
 		
-		//System.out.println("C_W_ID:" + w_id);
-		//System.out.println("C_D_ID:" + d_id);
-		//System.out.println("C_ID:" + c_id);
+		System.out.println("C_W_ID:" + w_id);
+		System.out.println("C_D_ID:" + d_id);
+		System.out.println("C_ID:" + c_id);
 		
-		//System.out.println("C_FIRST:" + customer.getString("c_first"));
-		//System.out.println("C_MIDDLE:" + customer.getString("c_middle"));
-		//System.out.println("C_LAST:" + customer.getString("c_last"));
+		System.out.println("C_FIRST:" + customer.getString("c_first"));
+		System.out.println("C_MIDDLE:" + customer.getString("c_middle"));
+		System.out.println("C_LAST:" + customer.getString("c_last"));
 		
-		//System.out.println("C_STREET_1:" + customer.getString("c_street_1"));
-		//System.out.println("C_STREET_2:" + customer.getString("c_street_2"));
-		//System.out.println("C_CITY:" + customer.getString("c_city"));
-		//System.out.println("C_STATE:" + customer.getString("c_state"));
-		//System.out.println("C_ZIP:" + customer.getString("c_zip"));
+		System.out.println("C_STREET_1:" + customer.getString("c_street_1"));
+		System.out.println("C_STREET_2:" + customer.getString("c_street_2"));
+		System.out.println("C_CITY:" + customer.getString("c_city"));
+		System.out.println("C_STATE:" + customer.getString("c_state"));
+		System.out.println("C_ZIP:" + customer.getString("c_zip"));
 		
-		//System.out.println("C_PHONE:" + customer.getString("c_phone"));
-		//System.out.println("C_SINCE:" + df.format(new Date(customer.getTimestamp("c_since").getTime())));
-		//System.out.println("C_CREDIT:" + customer.getString("c_credit"));
-		//System.out.println("C_REDIT_LIM:" + customer.getDouble("c_credit_lim"));
-		//System.out.println("C_DISCOUNT:" + customer.getDouble("c_discount"));
-		//System.out.println("C_BALANCE:" + customer.getDouble("c_balance"));
+		System.out.println("C_PHONE:" + customer.getString("c_phone"));
+		System.out.println("C_SINCE:" + df.format(new Date(customer.getTimestamp("c_since").getTime())));
+		System.out.println("C_CREDIT:" + customer.getString("c_credit"));
+		System.out.println("C_REDIT_LIM:" + customer.getDouble("c_credit_lim"));
+		System.out.println("C_DISCOUNT:" + customer.getDouble("c_discount"));
+		System.out.println("C_BALANCE:" + customer.getDouble("c_balance"));
 		
-		//System.out.println("W_STREET_1:" + customer.getString("w_street_1"));
-		//System.out.println("W_STREET_2:" + customer.getString("w_street_2"));
-		//System.out.println("W_CITY:" + customer.getString("w_city"));
-		//System.out.println("W_STATE:" + customer.getString("w_state"));
-		//System.out.println("W_ZIP:" + customer.getString("w_zip"));
+		System.out.println("W_STREET_1:" + customer.getString("w_street_1"));
+		System.out.println("W_STREET_2:" + customer.getString("w_street_2"));
+		System.out.println("W_CITY:" + customer.getString("w_city"));
+		System.out.println("W_STATE:" + customer.getString("w_state"));
+		System.out.println("W_ZIP:" + customer.getString("w_zip"));
 		
-		//System.out.println("D_STREET_1:" + customer.getString("d_street_1"));
-		//System.out.println("D_STREET_2:" + customer.getString("d_street_2"));
-		//System.out.println("D_CITY:" + customer.getString("d_city"));
-		//System.out.println("D_STATE:" + customer.getString("d_state"));
-		//System.out.println("D_ZIP:" + customer.getString("d_zip"));
+		System.out.println("D_STREET_1:" + customer.getString("d_street_1"));
+		System.out.println("D_STREET_2:" + customer.getString("d_street_2"));
+		System.out.println("D_CITY:" + customer.getString("d_city"));
+		System.out.println("D_STATE:" + customer.getString("d_state"));
+		System.out.println("D_ZIP:" + customer.getString("d_zip"));
 		
-		//System.out.println("PAYMENT:" + payment);
+		System.out.println("PAYMENT:" + payment);
 		
 		return true;
 	}
@@ -106,7 +106,7 @@ public class Payment {
 			if (results.wasApplied()) {
 				return warehouse;
 			} else {
-				//System.out.println("Fail to update warehouse");
+				System.out.println("Fail to update warehouse");
 				TransactionUtils.randomSleep();
 			}
 		}
@@ -141,7 +141,7 @@ public class Payment {
 			if (results.wasApplied()) {
 				return district;
 			} else {
-				//System.out.println("Fail to update district");
+				System.out.println("Fail to update district");
 				TransactionUtils.randomSleep();
 			}
 		}
@@ -181,7 +181,7 @@ public class Payment {
 			if (results.wasApplied()) {
 				return customer;
 			} else {
-				//System.out.println("Fail to update customer");
+				System.out.println("Fail to update customer");
 				TransactionUtils.randomSleep();
 			}
 		}
