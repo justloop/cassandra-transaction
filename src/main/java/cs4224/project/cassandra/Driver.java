@@ -22,7 +22,7 @@ public class Driver {
     private static void init(String keyspace) {
         CodecRegistry codecRegistry = new CodecRegistry();
         cluster = Cluster.builder().addContactPoints("localhost").withCodecRegistry(codecRegistry).withSocketOptions(new SocketOptions()
-                .setConnectTimeoutMillis(2000).setReadTimeoutMillis(2000)).build();
+                .setConnectTimeoutMillis(2000).setReadTimeoutMillis(2000)).withRetryPolicy(new CustomRetryPolicy(5,5,5)).build();
         UserType orderlineType = cluster.getMetadata().getKeyspace(keyspace).getUserType("Orderline");
         TypeCodec<UDTValue> orderlineTypeCodec = codecRegistry.codecFor(orderlineType);
         OrderlineCodec orderlineCodec = new OrderlineCodec(orderlineTypeCodec, Orderline.class);
