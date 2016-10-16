@@ -1,6 +1,7 @@
 # cs4224
 
 ## Code structure
+```
 ├── load-D8|D40: the scripts to create/drop keyspace, generate loadable csv from original data, load data into cassandra
     ├── schema: the original data csv schema, we put this header to all the original data
     ├── D8-data: the input data, which contains the schema header as well
@@ -25,6 +26,7 @@
     ├── transactions: the file to do individule transactions
     ├── Driver.java: the entry main class to run the transaction by reading from stdin and output to stderr
 ├── pom.xml: the maven config file
+```
 
 ## Configuration and run program
 1. Compile the program:
@@ -36,6 +38,7 @@
 
 3. Organize the folders:
     upload the files and organized as following
+    ```
     ├── load-D8|D40
         ├── cassandra
             ├── the generated data files
@@ -49,7 +52,7 @@
         ├── driver.jar
         ├── benchmark.py
     ├── benchmark_runner.sh
-
+    ```
     Note: the cassandra bin is assumed to be at: /temp/apache-cassandra-3.7/bin
 
 4. Run the benchmark_runner
