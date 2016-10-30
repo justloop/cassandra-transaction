@@ -1,4 +1,4 @@
-# Cassandra transactions
+# Cassandra transaction
 
 ## Code structure
 Code can be open with Intellij or Eclipse with Java8 (lambda level) and Maven3
